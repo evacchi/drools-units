@@ -1,11 +1,11 @@
-package org.jbpm.units;
+package org.kie.api;
 
 import java.util.Arrays;
 
 public interface Unit {
 
-    default Identity getUnitIdentity() {
-        return new Identity(this.getClass(), new Object[0]);
+    default Unit.Identity getUnitIdentity() {
+        return new Unit.Identity(this.getClass(), new Object[0]);
     }
 
     default void onStart() {
@@ -37,7 +37,7 @@ public interface Unit {
             if (this == o) {
                 return true;
             } else if (o != null && this.getClass() == o.getClass()) {
-                Identity identity = (Identity) o;
+                Unit.Identity identity = (Unit.Identity) o;
                 return this.cls.equals(identity.cls) && Arrays.equals(this.keys, identity.keys);
             } else {
                 return false;

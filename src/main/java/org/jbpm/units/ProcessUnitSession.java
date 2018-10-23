@@ -1,6 +1,7 @@
 package org.jbpm.units;
 
-public interface ProcessUnitSession {
-    ProcessUnit unit();
-    void start();
+import org.kie.api.UnitSession;
+
+public interface ProcessUnitSession extends UnitSession<ProcessUnit> {
+    <T> void signal(T signal);
 }
