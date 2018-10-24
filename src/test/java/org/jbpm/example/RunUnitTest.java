@@ -1,4 +1,4 @@
-package org.jbpm.units;
+package org.jbpm.example;
 
 import org.junit.Test;
 import org.kie.api.KieServices;

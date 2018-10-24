@@ -11,7 +11,7 @@
              xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
              xmlns:tns="http://www.jboss.org/drools">
 
-  <process processType="Private" isExecutable="true" id="org.jbpm.HelloWorld" name="Hello World" >
+  <process processType="Private" isExecutable="true" id="org.jbpm.example.HelloUnit" name="Hello World" >
 
     <!-- nodes -->
     <startEvent id="_1" name="StartProcess" />

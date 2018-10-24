@@ -5,7 +5,7 @@ import java.util.Arrays;
 public interface Unit {
 
     default Unit.Identity getUnitIdentity() {
-        return new Unit.Identity(this.getClass(), new Object[0]);
+        return new Unit.Identity(this.getClass());
     }
 
     default void onStart() {
@@ -27,10 +27,17 @@ public interface Unit {
 
         private final Class<? extends Unit> cls;
         private final Object[] keys;
+        private final String id;
 
         public Identity(Class<? extends Unit> cls, Object... keys) {
             this.cls = cls;
             this.keys = keys;
+            String baseName = cls.getCanonicalName();
+            if (keys.length != 0) {
+                this.id = baseName + Arrays.toString(keys);
+            } else {
+                this.id = baseName;
+            }
         }
 
         public boolean equals(Object o) {
@@ -48,6 +55,11 @@ public interface Unit {
             int result = this.cls.hashCode();
             result = 31 * result + Arrays.hashCode(this.keys);
             return result;
+        }
+
+        @Override
+        public String toString() {
+            return id;
         }
     }
 }
