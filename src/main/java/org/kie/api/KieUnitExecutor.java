@@ -1,9 +1,8 @@
 package org.kie.api;
 
-import org.jbpm.units.ProcessUnit;
 import org.kie.api.runtime.KieSession;
 
-public class KieUnitExecutor implements UnitExecutor<ProcessUnit> {
+public class KieUnitExecutor implements UnitExecutor {
 
     private KieSession session;
     private final KieBase kieBase;
@@ -14,7 +13,7 @@ public class KieUnitExecutor implements UnitExecutor<ProcessUnit> {
         this.session = session;
         this.kieBase = session.getKieBase();
         this.scheduler = new UnitScheduler();
-        this.sessionFactory = new TypeDrivenUnitSessionFactory(session);
+        this.sessionFactory = new TypeDrivenUnitSessionFactory(session, this);
     }
 
     public static KieUnitExecutor create(KieSession session) {
@@ -22,12 +21,12 @@ public class KieUnitExecutor implements UnitExecutor<ProcessUnit> {
     }
 
     @Override
-    public void run(ProcessUnit unit) {
-        UnitSession<? extends Unit> unitSession = sessionFactory.create(unit);
+    public void run(Unit unit) {
+        UnitSession unitSession = sessionFactory.create(unit);
         runSession(unitSession);
     }
 
-    private void runSession(UnitSession<? extends Unit> session) {
+    private void runSession(UnitSession session) {
         scheduler.schedule(session);
         session = scheduler.next();
         while (session != null) {

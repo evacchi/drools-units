@@ -1,5 +1,10 @@
 package org.kie.api;
 
-public interface UnitExecutor<T> {
-    void run(T unit);
+public interface UnitExecutor {
+
+    /**
+     * Schedule for execution the given Unit, and keeps running
+     * until the system reaches a stable state
+     */
+    void run(Unit unit);
 }

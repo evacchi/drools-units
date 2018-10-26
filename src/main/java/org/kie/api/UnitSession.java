@@ -1,13 +1,42 @@
 package org.kie.api;
 
-public interface UnitSession<T extends Unit> {
+import java.util.Collection;
 
-    interface Factory<U extends Unit, US extends UnitSession<? extends U>> {
+/**
+ * A runnable instance of a Unit.
+ *
+ * A UnitSession implements all the memory and lifecycle -related concerns
+ * of a running Unit instance.
+ *
+ */
+public interface UnitSession {
 
-        US create(U unit) ;
+    interface Factory {
+
+        UnitSession create(Unit unit);
     }
-    T unit();
+
+    enum State {
+        Active,
+        Suspended,
+        Completed;
+    }
+
+    Unit unit();
 
     void start();
+
     void halt();
+
+    /**
+     * 
+     * @return
+     */
+    Collection<UnitSession> references();
+
+    void signal(UnitSessionSignal signal);
+
+    void yield(UnitSession next);
+
+    State state();
 }
