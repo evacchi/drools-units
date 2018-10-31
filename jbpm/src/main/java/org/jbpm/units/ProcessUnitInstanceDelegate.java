@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
-import org.jbpm.units.ProcessUnitSessionSignal.Event;
+import org.jbpm.units.ProcessUnitInstanceSignal.Event;
 import org.jbpm.units.internal.BeanMap;
 import org.kie.api.UnitInstance;
 import org.kie.api.UnitSessionSignal;
@@ -16,14 +16,14 @@ import org.kie.api.runtime.process.ProcessInstance;
  * A UnitSession for BPM Processes, delegating internally to
  * jBPM's ProcessInstance
  */
-class ProcessUnitSessionDelegate implements ProcessUnitSession {
+class ProcessUnitInstanceDelegate implements ProcessUnitInstance {
 
     private final KieSession session;
     private final ProcessUnit processUnit;
     private final ProcessInstance processInstance;
     private final BeanMap beanMap;
 
-    public ProcessUnitSessionDelegate(
+    public ProcessUnitInstanceDelegate(
             ProcessUnit processUnit,
             KieSession session) {
         String processId = processUnit.getUnitIdentity().toString();

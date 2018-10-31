@@ -2,6 +2,8 @@ package org.kie.api;
 
 import java.util.Arrays;
 
+import org.kie.api.runtime.KieSession;
+
 public interface Unit {
 
     default Unit.Identity getUnitIdentity() {

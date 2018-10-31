@@ -2,12 +2,12 @@ package org.jbpm.units;
 
 import org.kie.api.UnitSessionSignal;
 
-public interface ProcessUnitSessionSignal extends UnitSessionSignal {
+public interface ProcessUnitInstanceSignal extends UnitSessionSignal {
 
     /**
      * Represents a process signal event
      */
-    class Event implements ProcessUnitSessionSignal {
+    class Event implements ProcessUnitInstanceSignal {
         private final String type;
         private final Object payload;
 

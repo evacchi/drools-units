@@ -4,16 +4,11 @@ import java.util.Collection;
 
 /**
  * A runnable instance of a Unit.
- *
+ * <p>
  * A UnitSession implements all the memory and lifecycle -related concerns
  * of a running Unit instance.
- *
  */
 public interface UnitInstance {
-
-    interface Factory {
-        UnitInstance create(Unit unit);
-    }
 
     enum State {
         Active,
@@ -30,7 +25,6 @@ public interface UnitInstance {
     /**
      * Sessions that reference this session.
      * E.g. "Guards" reference the units they guard
-     *
      */
     Collection<UnitInstance> references();
 
