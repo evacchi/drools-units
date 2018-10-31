@@ -9,10 +9,10 @@ import java.util.Collection;
  * of a running Unit instance.
  *
  */
-public interface UnitSession {
+public interface UnitInstance {
 
     interface Factory {
-        UnitSession create(Unit unit);
+        UnitInstance create(Unit unit);
     }
 
     enum State {
@@ -32,11 +32,11 @@ public interface UnitSession {
      * E.g. "Guards" reference the units they guard
      *
      */
-    Collection<UnitSession> references();
+    Collection<UnitInstance> references();
 
     void signal(UnitSessionSignal signal);
 
-    void yield(UnitSession next);
+    void yield(UnitInstance next);
 
     State state();
 }

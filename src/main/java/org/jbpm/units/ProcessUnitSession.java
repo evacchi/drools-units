@@ -1,7 +1,7 @@
 package org.jbpm.units;
 
-import org.kie.api.UnitSession;
+import org.kie.api.UnitInstance;
 
-public interface ProcessUnitSession extends UnitSession {
+public interface ProcessUnitSession extends UnitInstance {
     long id();
 }

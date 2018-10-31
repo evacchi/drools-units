@@ -11,8 +11,8 @@ import java.util.function.Predicate;
  */
 public class UnitScheduler {
 
-    private UnitSession stackPointer;
-    private final LinkedList<UnitSession> units = new LinkedList<>();
+    private UnitInstance stackPointer;
+    private final LinkedList<UnitInstance> units = new LinkedList<>();
 
     public UnitScheduler() {
 
@@ -23,7 +23,7 @@ public class UnitScheduler {
      *
      * @return null if no UnitSession has been scheduled currently
      */
-    public UnitSession current() {
+    public UnitInstance current() {
         return stackPointer;
     }
 
@@ -31,7 +31,7 @@ public class UnitScheduler {
      * Schedules a UnitSession for execution
      * @param session
      */
-    public void schedule(UnitSession session) {
+    public void schedule(UnitInstance session) {
         stackPointer = null;
         units.push(session);
     }
@@ -41,8 +41,8 @@ public class UnitScheduler {
      * @param candidate
      * @param isInsertionPoint true when the given UnitSession is the desired insertion point
      */
-    public void scheduleAfter(UnitSession candidate, Predicate<UnitSession> isInsertionPoint) {
-        UnitSession current = this.current();
+    public void scheduleAfter(UnitInstance candidate, Predicate<UnitInstance> isInsertionPoint) {
+        UnitInstance current = this.current();
         if (current != null && isInsertionPoint.test(current)) {
             units.push(current);
             units.push(candidate);
@@ -56,12 +56,12 @@ public class UnitScheduler {
      * Advances the internal stack pointer, returns the next active UnitSession
      * for execution
      */
-    public UnitSession next() {
+    public UnitInstance next() {
         if (stackPointer != null) {
             units.addAll(stackPointer.references());
         }
         stackPointer = units.poll();
-        while (stackPointer != null && stackPointer.state() != UnitSession.State.Active) {
+        while (stackPointer != null && stackPointer.state() != UnitInstance.State.Active) {
             stackPointer = units.poll();
         }
         return stackPointer;

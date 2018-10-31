@@ -12,7 +12,7 @@ public class TypeDrivenUnitSessionFactory {
         this.processUnitSessionFactory = new ProcessUnitSessionFactory(session);
     }
 
-    public UnitSession create(Unit unit) {
+    public UnitInstance create(Unit unit) {
         if (unit instanceof ProcessUnit) {
             return processUnitSessionFactory.create(unit);
         }

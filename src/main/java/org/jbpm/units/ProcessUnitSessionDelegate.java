@@ -7,7 +7,7 @@ import org.jbpm.process.instance.context.variable.VariableScopeInstance;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.jbpm.units.ProcessUnitSessionSignal.Event;
 import org.jbpm.units.internal.BeanMap;
-import org.kie.api.UnitSession;
+import org.kie.api.UnitInstance;
 import org.kie.api.UnitSessionSignal;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
@@ -66,12 +66,12 @@ class ProcessUnitSessionDelegate implements ProcessUnitSession {
     }
 
     @Override
-    public void yield(UnitSession next) {
+    public void yield(UnitInstance next) {
         // unsupported
     }
 
     @Override
-    public Collection<UnitSession> references() {
+    public Collection<UnitInstance> references() {
         // processes that point at this (currently unsupported)
         return Collections.emptyList();
     }

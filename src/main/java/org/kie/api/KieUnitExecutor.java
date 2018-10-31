@@ -22,11 +22,11 @@ public class KieUnitExecutor implements UnitExecutor {
 
     @Override
     public void run(Unit unit) {
-        UnitSession unitSession = sessionFactory.create(unit);
+        UnitInstance unitSession = sessionFactory.create(unit);
         runSession(unitSession);
     }
 
-    private void runSession(UnitSession session) {
+    private void runSession(UnitInstance session) {
         scheduler.schedule(session);
         session = scheduler.next();
         while (session != null) {

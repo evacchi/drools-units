@@ -1,7 +1,7 @@
 package org.jbpm.units;
 
 import org.kie.api.Unit;
-import org.kie.api.UnitSession;
+import org.kie.api.UnitInstance;
 import org.kie.api.runtime.KieSession;
 
 public class ProcessUnitSessionFactory {
@@ -12,7 +12,7 @@ public class ProcessUnitSessionFactory {
         this.session = session;
     }
 
-    public UnitSession create(Unit unit) {
+    public UnitInstance create(Unit unit) {
         return new ProcessUnitSessionDelegate((ProcessUnit) unit, session);
     }
 }
