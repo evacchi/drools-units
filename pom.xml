@@ -18,6 +18,8 @@
     <module>api</module>
     <module>executor</module>
     <module>jbpm</module>
+    <module>drools</module>
+    <module>integration</module>
   </modules>
 
 </project>

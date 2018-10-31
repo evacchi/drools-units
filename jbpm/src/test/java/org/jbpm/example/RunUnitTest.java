@@ -3,6 +3,7 @@ package org.jbpm.example;
 import org.jbpm.units.ProcessUnitSupport;
 import org.junit.Test;
 import org.kie.api.KieUnitExecutor;
+import org.kie.api.RuntimeUnitSupport;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,9 +12,9 @@ public class RunUnitTest {
     @Test
     public void runHelloUnit() {
         HelloUnit u = new HelloUnit();
-        KieUnitExecutor
-                .create(ProcessUnitSupport.get())
-                .run(u);
+        KieUnitExecutor.create(
+                RuntimeUnitSupport.register(
+                        ProcessUnitSupport.get())).run(u);
     }
 
     @Test
