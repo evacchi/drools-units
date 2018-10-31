@@ -12,7 +12,6 @@ import java.util.Collection;
 public interface UnitSession {
 
     interface Factory {
-
         UnitSession create(Unit unit);
     }
 
@@ -29,8 +28,9 @@ public interface UnitSession {
     void halt();
 
     /**
-     * 
-     * @return
+     * Sessions that reference this session.
+     * E.g. "Guards" reference the units they guard
+     *
      */
     Collection<UnitSession> references();
 
