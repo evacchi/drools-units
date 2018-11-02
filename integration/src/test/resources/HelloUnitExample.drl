@@ -1,0 +1,11 @@
+
+
+package org.kie.units.example
+unit HelloRuleUnit
+
+rule OnName when
+    $p : /name
+then
+    System.out.println("Hello from a Rule, " + $p);
+end
+

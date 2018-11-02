@@ -16,6 +16,11 @@ public class KieUnitExecutor implements UnitExecutor {
         this.sessionFactory = supportProvider;
     }
 
+    public static KieUnitExecutor create(KieSession session, UnitSupport.Provider factory) {
+        return new KieUnitExecutor(
+                session, factory.get(session));
+    }
+
     public static KieUnitExecutor create(UnitSupport.Provider factory) {
         KieSession session = KieServices.Factory.get()
                 .getKieClasspathContainer()

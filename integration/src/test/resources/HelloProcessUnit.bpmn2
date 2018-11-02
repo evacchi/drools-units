@@ -11,12 +11,12 @@
              xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
              xmlns:tns="http://www.jboss.org/drools">
 
-  <process processType="Private" isExecutable="true" id="org.kie.units.example.HelloUnit" name="Hello World" >
+  <process processType="Private" isExecutable="true" id="org.kie.units.example.HelloProcessUnit" name="Hello World" >
 
     <!-- nodes -->
     <startEvent id="_1" name="StartProcess" />
     <scriptTask id="_2" name="Hello" >
-      <script>System.out.println("Hello World");</script>
+      <script>System.out.println("Hello from a Process, " + kcontext.getVariable("name"));</script>
     </scriptTask>
     <endEvent id="_3" name="EndProcess" >
       <terminateEventDefinition/>

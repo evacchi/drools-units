@@ -1,5 +1,6 @@
 package org.jbpm.units;
 
+import org.kie.api.UnitInstance;
 import org.kie.api.UnitSessionSignal;
 
 public interface ProcessUnitInstanceSignal extends UnitSessionSignal {
@@ -22,6 +23,11 @@ public interface ProcessUnitInstanceSignal extends UnitSessionSignal {
 
         public Object payload() {
             return payload;
+        }
+
+        @Override
+        public void exec(UnitInstance unitInstance) {
+            throw new UnsupportedOperationException("not yet implemented");
         }
     }
 
