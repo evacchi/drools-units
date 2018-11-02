@@ -1,4 +1,4 @@
-package org.drools.units.internal;
+package org.drools.units;
 
 import org.kie.api.UnitSessionSignal;
 

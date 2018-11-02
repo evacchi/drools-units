@@ -1,12 +1,13 @@
-package org.drools.core.impl;
+package org.drools.units.internal;
 
 import java.util.Collection;
 
 import org.drools.core.datasources.InternalDataSource;
+import org.drools.core.impl.InternalRuleUnitExecutor;
+import org.drools.core.impl.RuleUnitInternals.Factory;
 import org.drools.core.spi.Activation;
-import org.drools.units.internal.RuleUnitSignal;
+import org.drools.units.RuleUnitSignal;
 import org.kie.api.KieBase;
-import org.kie.api.KieServices;
 import org.kie.api.Unit;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitSchedulerSignal;
@@ -20,9 +21,9 @@ import org.kie.api.runtime.rule.RuleUnitExecutor;
 public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     private final UnitExecutor unitExecutor;
-    private final RuleUnitInstance.Factory ruleUnitSessionFactory;
+    private final Factory ruleUnitSessionFactory;
 
-    public LegacyRuleUnitExecutor(UnitExecutor unitExecutor, RuleUnitInstance.Factory ruleUnitSessionFactory) {
+    public LegacyRuleUnitExecutor(UnitExecutor unitExecutor, Factory ruleUnitSessionFactory) {
         this.unitExecutor = unitExecutor;
         this.ruleUnitSessionFactory = ruleUnitSessionFactory;
     }

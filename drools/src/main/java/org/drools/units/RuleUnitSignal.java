@@ -1,8 +1,8 @@
-package org.drools.units.internal;
+package org.drools.units;
 
 import java.util.Optional;
 
-import org.drools.core.impl.GuardedRuleUnitSession;
+import org.drools.units.GuardedRuleUnitSession;
 import org.drools.core.spi.Activation;
 import org.kie.api.UnitInstance;
 import org.kie.api.UnitScheduler;

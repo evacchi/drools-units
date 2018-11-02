@@ -2,7 +2,8 @@ package org.drools.units;
 
 import java.util.Optional;
 
-import org.drools.core.impl.RuleUnitInstance;
+import org.drools.units.internal.LegacyRuleUnitExecutor;
+import org.drools.core.impl.RuleUnitInternals.Factory;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.kie.api.Unit;
 import org.kie.api.UnitExecutor;
@@ -17,13 +18,14 @@ public class RuleUnitSupport implements UnitSupport {
         return RuleUnitSupport::new;
     }
 
-    private final RuleUnitInstance.Factory delegate;
+    private final Factory delegate;
     private final KieSession session;
 
     public RuleUnitSupport(UnitExecutor executor) {
         this.session = ((LegacySessionWrapper) executor).getSession();
-        this.delegate = new RuleUnitInstance.Factory((StatefulKnowledgeSessionImpl) session);
-        delegate.bind(((StatefulKnowledgeSessionImpl) session).getKnowledgeBase());
+        this.delegate = new Factory((StatefulKnowledgeSessionImpl) session);
+        this.delegate.setLegacyExecutor(new LegacyRuleUnitExecutor(executor, delegate));
+        this.delegate.bind(((StatefulKnowledgeSessionImpl) session).getKnowledgeBase());
     }
 
     public Optional<UnitInstance> createInstance(Unit unit) {
@@ -33,5 +35,4 @@ public class RuleUnitSupport implements UnitSupport {
             return Optional.empty();
         }
     }
-
 }
