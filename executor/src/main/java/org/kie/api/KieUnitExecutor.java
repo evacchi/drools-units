@@ -30,7 +30,8 @@ public class KieUnitExecutor implements UnitExecutor,
     @Override
     public void run(Unit unit) {
         UnitInstance unitInstance = sessionFactory.createInstance(unit)
-                .orElseThrow(() -> new UnsupportedOperationException("Unit type is not supported: " + unit.getClass()));
+                .orElseThrow(() -> new UnsupportedOperationException(
+                        "Unit type is not supported: " + unit.getClass()));
         runSession(unitInstance);
     }
 

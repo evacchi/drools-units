@@ -9,13 +9,13 @@ public interface ProcessUnit extends Unit {
         return new ProcessIdentity(getClass());
     }
 
-    class ProcessIdentity extends org.kie.api.runtime.rule.RuleUnit.Identity {
+    class ProcessIdentity extends Unit.Identity {
 
         private final Class<?> cls;
         private final Object[] keys;
 
         public ProcessIdentity(Class<?> cls, Object... keys) {
-            super((Class) cls, keys);
+            super(cls, keys);
             this.cls = cls;
             this.keys = keys;
         }

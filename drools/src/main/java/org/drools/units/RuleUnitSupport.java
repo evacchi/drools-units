@@ -2,9 +2,9 @@ package org.drools.units;
 
 import java.util.Optional;
 
-import org.drools.units.internal.LegacyRuleUnitExecutor;
 import org.drools.core.impl.RuleUnitInternals.Factory;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
+import org.drools.units.internal.LegacyRuleUnitExecutor;
 import org.kie.api.Unit;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;

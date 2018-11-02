@@ -66,14 +66,13 @@ public class RuleUnitInternals {
         }
     }
 
-    public static class Factory  {
+    public static class Factory {
 
         private final StatefulKnowledgeSessionImpl session;
         private final EntryPoint entryPoint;
         private final Registry registry;
         private InternalKnowledgeBase kiebase;
         public final LegacyRuleUnitFactory ruleUnitFactory;
-
 
         public Factory(StatefulKnowledgeSessionImpl session) {
             this.session = session;
@@ -85,7 +84,6 @@ public class RuleUnitInternals {
             this.session.init(
                     new SessionConfigurationImpl(),
                     EnvironmentFactory.newEnvironment());
-
 
             this.session.agendaEventSupport = new AgendaEventSupport();
             this.session.ruleRuntimeEventSupport = new RuleRuntimeEventSupport();
