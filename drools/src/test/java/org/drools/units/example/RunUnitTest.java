@@ -12,7 +12,7 @@ public class RunUnitTest {
         HelloUnit u = new HelloUnit("Ed");
 
         KieUnitExecutor kieUnitExecutor =
-                KieUnitExecutor.create(RuleUnitSupport.get());
+                KieUnitExecutor.create(RuleUnitSupport::new);
 
         kieUnitExecutor.run(u);
     }

@@ -5,21 +5,20 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class RuntimeUnitSupport implements UnitSupport {
+public class DynamicUnitSupport implements UnitSupport {
 
     public static UnitSupport.Provider register(UnitSupport.Provider... unitInstanceFactories) {
-        return executor -> new RuntimeUnitSupport(executor, Arrays.asList(unitInstanceFactories));
+        return executor -> new DynamicUnitSupport(
+                Arrays.stream(unitInstanceFactories)
+                        .map(f -> f.get(executor))
+                        .collect(Collectors.toList()));
     }
 
     private Collection<UnitSupport> unitInstanceFactories;
 
-    private RuntimeUnitSupport(
-            UnitExecutor executor,
-            Collection<UnitSupport.Provider> unitInstanceFactories) {
-        this.unitInstanceFactories =
-                unitInstanceFactories.stream()
-                        .map(f -> f.get(executor))
-                        .collect(Collectors.toList());
+    private DynamicUnitSupport(
+            Collection<UnitSupport> unitInstanceFactories) {
+        this.unitInstanceFactories = unitInstanceFactories;
     }
 
     public Optional<UnitInstance> createInstance(Unit unit) {

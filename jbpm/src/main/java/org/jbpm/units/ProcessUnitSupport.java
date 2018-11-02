@@ -11,10 +11,6 @@ import org.kie.api.runtime.KieSession;
 
 public class ProcessUnitSupport implements UnitSupport {
 
-    public static Provider get() {
-        return ProcessUnitSupport::new;
-    }
-
     private final KieSession session;
 
     public ProcessUnitSupport(UnitExecutor executor) {

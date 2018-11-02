@@ -14,10 +14,6 @@ import org.kie.api.runtime.KieSession;
 
 public class RuleUnitSupport implements UnitSupport {
 
-    public static Provider get() {
-        return RuleUnitSupport::new;
-    }
-
     private final Factory delegate;
     private final KieSession session;
 
