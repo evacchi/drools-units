@@ -137,14 +137,14 @@ public class RuleUnitInstance implements UnitInstance {
 //
     @Override
     public void signal(UnitSessionSignal signal) {
-        if (signal instanceof RuleUnitSessionSignal) {
+        if (signal instanceof RuleUnitInstanceSignal) {
             signal.exec(this);
         }
     }
 
     @Override
     public State state() {
-        return isActive() ? State.Active : State.Suspended;
+        return isActive() ? State.Running : State.Suspended;
     }
 
     private Globals getGlobalResolver() {

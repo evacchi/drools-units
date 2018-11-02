@@ -2,6 +2,7 @@ package org.kie.api;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -61,7 +62,9 @@ public class UnitScheduler {
             units.addAll(stackPointer.references());
         }
         stackPointer = units.poll();
-        while (stackPointer != null && stackPointer.state() != UnitInstance.State.Active) {
+        while (stackPointer != null &&
+                stackPointer.state() != UnitInstance.State.Created &&
+                stackPointer.state() != UnitInstance.State.Running) {
             stackPointer = units.poll();
         }
         return stackPointer;

@@ -11,9 +11,11 @@ import java.util.Collection;
 public interface UnitInstance {
 
     enum State {
-        Active,
+        Created,
+        Running,
         Suspended,
-        Completed;
+        Completed,
+        Aborted;
     }
 
     Unit unit();

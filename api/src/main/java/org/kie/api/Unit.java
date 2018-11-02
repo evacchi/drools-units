@@ -25,6 +25,8 @@ public interface Unit extends org.kie.api.runtime.rule.RuleUnit {
     default void onYield(Unit other) {
     }
 
+    default void onCreate() {}
+
     public static class Identity extends RuleUnit.Identity {
 
         private final Class<?> cls;
