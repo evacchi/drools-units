@@ -1,14 +1,15 @@
 package org.kie.api;
 
-import org.kie.api.runtime.KieSession;
+import java.util.Optional;
 
 public interface UnitSupport {
 
     interface Provider {
-
-        UnitSupport get(KieSession session);
+        UnitSupport get(UnitExecutor executor);
     }
 
-    UnitInstance createInstance(Unit unit);
-    boolean handles(Unit u);
+    /**
+     * Returns Optional.empty when it does not support the type of the given unit
+     */
+    Optional<UnitInstance> createInstance(Unit unit);
 }

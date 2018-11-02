@@ -21,7 +21,7 @@ public interface SystemUnitSessionSignal extends UnitSessionSignal {
             scheduler.scheduleAfter(
                     session,
                     us -> us.unit()
-//                            .getUnitIdentity()
+                            .getUnitIdentity()
                             .equals(identity));
         }
     }

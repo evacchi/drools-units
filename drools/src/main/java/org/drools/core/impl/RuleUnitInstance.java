@@ -111,11 +111,10 @@ public class RuleUnitInstance implements UnitInstance {
 
 //    @Override
     public void yield(UnitInstance unit) {
-        throw new UnsupportedOperationException();
-//        yielded = true;
-//        ruleUnit.onYield(unit);
-//        session.getPropagationList().flush();
-//        agenda.unfocus(ruleUnit);
+        yielded = true;
+        ruleUnit.onYield(unit.unit());
+        session.getPropagationList().flush();
+        agenda.unfocus(ruleUnit);
     }
 
 //    @Override
