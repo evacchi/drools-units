@@ -24,17 +24,10 @@ public class RuleUnitSupport implements UnitSupport {
     }
 
     public Optional<UnitInstance> createInstance(UnitInstance.Proto proto) {
-        if (proto instanceof GuardedRuleUnitInstance.Proto) {
-            RuleUnitInstance instance =
-                    delegate.createGuard(proto);
-            return Optional.of(instance);
-        } else if (proto.unit() instanceof RuleUnit) {
-            RuleUnitInstance instance =
-                    delegate.create(proto);
-            return Optional.of(instance);
+        if (proto.unit() instanceof RuleUnit) {
+            return Optional.of(delegate.create(proto));
         } else {
             return Optional.empty();
         }
     }
-
 }

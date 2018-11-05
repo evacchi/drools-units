@@ -1,7 +1,7 @@
 package org.drools.units.signals;
 
 import org.drools.core.spi.Activation;
-import org.drools.units.GuardedRuleUnitInstance;
+import org.drools.units.GuardedUnitInstance;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitScheduler;
 
@@ -17,7 +17,7 @@ public class UnregisterGuard implements UnitExecutor.Signal.Broacast {
     public void exec(UnitScheduler scheduler) {
         scheduler.current().references()
                 .stream()
-                .filter(u -> u instanceof GuardedRuleUnitInstance)
-                .forEach(u -> ((GuardedRuleUnitInstance) u).removeActivation(activation));
+                .filter(u -> u instanceof GuardedUnitInstance)
+                .forEach(u -> ((GuardedUnitInstance) u).removeActivation(activation));
     }
 }

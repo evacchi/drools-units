@@ -40,7 +40,7 @@ public interface UnitInstance {
         void exec(UnitInstance unitInstance);
     }
 
-    class Proto {
+    final class Proto {
         private final Unit unit;
         private final UnitBinding[] bindings;
 

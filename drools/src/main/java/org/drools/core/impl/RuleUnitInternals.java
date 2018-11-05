@@ -13,7 +13,7 @@ import org.drools.core.event.RuleEventListenerSupport;
 import org.drools.core.event.RuleRuntimeEventSupport;
 import org.drools.core.ruleunit.RuleUnitFactory;
 import org.drools.core.spi.AgendaGroup;
-import org.drools.units.GuardedRuleUnitInstance;
+import org.drools.units.GuardedUnitInstance;
 import org.drools.units.RuleUnit;
 import org.drools.units.RuleUnitInstance;
 import org.drools.units.internal.LegacyRuleUnitExecutor;
@@ -103,17 +103,6 @@ public class RuleUnitInternals {
         public RuleUnitInstance create(UnitInstance.Proto proto) {
             injectBindings(proto);
             return registry.register(new RuleUnitInstance(
-                    (RuleUnit) proto.unit(),
-                    session,
-                    entryPoint));
-        }
-
-        /**
-         * Instantiates a guarded session for the given unit
-         */
-        public GuardedRuleUnitInstance createGuard(UnitInstance.Proto proto) {
-            injectBindings(proto);
-            return registry.register(new GuardedRuleUnitInstance(
                     (RuleUnit) proto.unit(),
                     session,
                     entryPoint));

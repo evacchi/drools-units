@@ -8,7 +8,7 @@ import org.drools.core.datasources.CursoredDataSource;
 import org.drools.core.datasources.InternalDataSource;
 import org.drools.core.impl.InternalRuleUnitExecutor;
 import org.drools.core.spi.Activation;
-import org.drools.units.GuardedRuleUnitInstance;
+import org.drools.units.GuardedUnitInstance;
 import org.drools.units.signals.RegisterGuard;
 import org.drools.units.signals.Resume;
 import org.drools.units.signals.Suspend;
@@ -142,7 +142,7 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
     public void guardRuleUnit(RuleUnit ruleUnit, Activation activation) {
         RegisterGuard registerGuardSignal =
                 new RegisterGuard(
-                        new GuardedRuleUnitInstance.Proto((Unit) ruleUnit, bindings()),
+                        new UnitInstance.Proto((Unit) ruleUnit, bindings()),
                         activation);
         unitExecutor.signal(registerGuardSignal);
     }
