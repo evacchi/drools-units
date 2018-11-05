@@ -9,7 +9,11 @@ import org.drools.core.datasources.InternalDataSource;
 import org.drools.core.impl.InternalRuleUnitExecutor;
 import org.drools.core.spi.Activation;
 import org.drools.units.GuardedRuleUnitInstance;
-import org.drools.units.RuleUnitSignal;
+import org.drools.units.signals.RegisterGuard;
+import org.drools.units.signals.Resume;
+import org.drools.units.signals.Suspend;
+import org.drools.units.signals.UnregisterGuard;
+import org.drools.units.signals.Yield;
 import org.kie.api.KieBase;
 import org.kie.api.Unit;
 import org.kie.api.UnitBinding;
@@ -108,14 +112,12 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void onSuspend() {
-        UnitExecutor.Signal.Broacast signal = RuleUnitSignal.suspend();
-        unitExecutor.signal(signal);
+        unitExecutor.signal(Suspend.Instance);
     }
 
     @Override
     public void onResume() {
-        UnitExecutor.Signal.Broacast signal = RuleUnitSignal.resume();
-        unitExecutor.signal(signal);
+        unitExecutor.signal(Resume.Instance);
     }
 
     @Override
@@ -125,7 +127,7 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void switchToRuleUnit(RuleUnit ruleUnit, Activation activation) {
-        RuleUnitSignal.YieldSignal yieldSignal = RuleUnitSignal.yield(
+        Yield yieldSignal = new Yield(
                 new UnitInstance.Proto((Unit) ruleUnit, bindings()),
                 activation.getRule().getRuleUnitClassName());
         unitExecutor.signal(yieldSignal);
@@ -138,8 +140,8 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void guardRuleUnit(RuleUnit ruleUnit, Activation activation) {
-        RuleUnitSignal.RegisterGuardSignal registerGuardSignal =
-                RuleUnitSignal.registerGuard(
+        RegisterGuard registerGuardSignal =
+                new RegisterGuard(
                         new GuardedRuleUnitInstance.Proto((Unit) ruleUnit, bindings()),
                         activation);
         unitExecutor.signal(registerGuardSignal);
@@ -147,8 +149,8 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void cancelActivation(Activation activation) {
-        RuleUnitSignal.UnregisterGuardSignal signal =
-                RuleUnitSignal.unregisterGuard(activation);
+        UnregisterGuard signal =
+                new UnregisterGuard(activation);
         unitExecutor.signal(signal);
     }
 

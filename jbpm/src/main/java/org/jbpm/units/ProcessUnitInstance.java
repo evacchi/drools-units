@@ -3,11 +3,9 @@ package org.jbpm.units;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.jbpm.units.ProcessUnitInstanceSignal.Event;
 import org.jbpm.units.internal.VariableBinder;
+import org.jbpm.units.signals.Event;
 import org.kie.api.UnitInstance;
-import org.kie.api.UnitInstance.State;
-import org.kie.api.UnitSessionSignal;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
 
@@ -16,6 +14,10 @@ import org.kie.api.runtime.process.ProcessInstance;
  * jBPM's ProcessInstance
  */
 public class ProcessUnitInstance implements UnitInstance {
+
+    public interface Signal extends UnitInstance.Signal {
+
+    }
 
     private final KieSession session;
     private final ProcessUnit processUnit;
