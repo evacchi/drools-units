@@ -136,7 +136,7 @@ public class RuleUnitInstance implements UnitInstance {
 //    }
 //
     @Override
-    public void signal(UnitSessionSignal signal) {
+    public void signal(UnitInstance.Signal signal) {
         if (signal instanceof RuleUnitInstanceSignal) {
             signal.exec(this);
         }

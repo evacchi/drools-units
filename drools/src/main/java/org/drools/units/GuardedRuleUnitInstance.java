@@ -6,12 +6,21 @@ import java.util.Set;
 import org.drools.core.impl.RuleUnitInternals.EntryPoint;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.spi.Activation;
+import org.kie.api.Unit;
+import org.kie.api.UnitBinding;
+import org.kie.api.UnitInstance;
 
-public class GuardedRuleUnitSession extends RuleUnitInstance {
+public class GuardedRuleUnitInstance extends RuleUnitInstance {
+
+    public static class Proto extends UnitInstance.Proto {
+        public Proto(Unit unit, UnitBinding... bindings) {
+            super(unit, bindings);
+        }
+    }
 
     private Set<Activation> activations = new HashSet<>();
 
-    public GuardedRuleUnitSession(
+    public GuardedRuleUnitInstance(
             RuleUnit unit,
             StatefulKnowledgeSessionImpl session,
             EntryPoint entryPoint) {

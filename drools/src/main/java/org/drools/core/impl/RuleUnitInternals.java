@@ -1,6 +1,5 @@
 package org.drools.core.impl;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -9,23 +8,21 @@ import org.drools.core.SessionConfigurationImpl;
 import org.drools.core.common.AgendaGroupQueueImpl;
 import org.drools.core.common.InternalAgenda;
 import org.drools.core.common.InternalAgendaGroup;
-import org.drools.core.datasources.InternalDataSource;
 import org.drools.core.event.AgendaEventSupport;
 import org.drools.core.event.RuleEventListenerSupport;
 import org.drools.core.event.RuleRuntimeEventSupport;
+import org.drools.core.ruleunit.RuleUnitFactory;
 import org.drools.core.spi.AgendaGroup;
-import org.drools.units.GuardedRuleUnitSession;
+import org.drools.units.GuardedRuleUnitInstance;
 import org.drools.units.RuleUnit;
 import org.drools.units.RuleUnitInstance;
 import org.drools.units.internal.LegacyRuleUnitExecutor;
 import org.kie.api.UnitBinding;
 import org.kie.api.KieBase;
 import org.kie.api.UnitInstance;
-import org.kie.api.runtime.rule.DataSource;
 import org.kie.api.runtime.rule.FactHandle;
 
 import static org.drools.core.ruleunit.RuleUnitUtil.RULE_UNIT_ENTRY_POINT;
-import static org.drools.core.util.ClassUtils.isAssignable;
 
 public class RuleUnitInternals {
 
@@ -75,6 +72,7 @@ public class RuleUnitInternals {
         private final StatefulKnowledgeSessionImpl session;
         private final EntryPoint entryPoint;
         private final Registry registry;
+        private final RuleUnitFactory ruleUnitFactory;
         private InternalKnowledgeBase kiebase;
 //        public final LegacyRuleUnitFactory ruleUnitFactory;
 
@@ -83,7 +81,7 @@ public class RuleUnitInternals {
             this.kiebase = (InternalKnowledgeBase) session.getKieBase();
             this.entryPoint = new EntryPoint(session);
             this.registry = new Registry();
-//            this.ruleUnitFactory = new LegacyRuleUnitFactory();
+            this.ruleUnitFactory = new RuleUnitFactory();
 
             this.session.init(
                     new SessionConfigurationImpl(),
@@ -102,12 +100,10 @@ public class RuleUnitInternals {
         /**
          * Instantiates a session for the given unit
          */
-        public RuleUnitInstance create(RuleUnit ruleUnit, UnitBinding... binding) {
-//            RuleUnit unit = ruleUnitFactory.injectUnitVariables(
-//                    session.ruleUnitExecutor, ruleUnit);
-
+        public RuleUnitInstance create(UnitInstance.Proto proto) {
+            injectBindings(proto);
             return registry.register(new RuleUnitInstance(
-                    ruleUnit,
+                    (RuleUnit) proto.unit(),
                     session,
                     entryPoint));
         }
@@ -115,11 +111,19 @@ public class RuleUnitInternals {
         /**
          * Instantiates a guarded session for the given unit
          */
-        public org.drools.units.GuardedRuleUnitSession createGuard(RuleUnit unit) {
-            return registry.register(new GuardedRuleUnitSession(
-                    unit,
+        public GuardedRuleUnitInstance createGuard(UnitInstance.Proto proto) {
+            injectBindings(proto);
+            return registry.register(new GuardedRuleUnitInstance(
+                    (RuleUnit) proto.unit(),
                     session,
                     entryPoint));
+        }
+
+        private void injectBindings(UnitInstance.Proto proto) {
+            for (UnitBinding binding : proto.bindings()) {
+                ruleUnitFactory.bindVariable(binding.name(), binding.value());
+            }
+            ruleUnitFactory.injectUnitVariables(session.ruleUnitExecutor, proto.unit());
         }
 
         public void bind(KieBase kiebase) {

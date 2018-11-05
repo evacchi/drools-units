@@ -27,17 +27,16 @@ public class KieUnitExecutor implements UnitExecutor,
         return new KieUnitExecutor(session, factory);
     }
 
-    @Override
-    public void run(Unit unit, UnitBinding... bindings) {
-        UnitInstance unitInstance = sessionFactory.createInstance(new UnitInstance.Proto(unit, bindings))
-                .orElseThrow(() -> new UnsupportedOperationException(
-                        "Unit type is not supported: " + unit.getClass()));
-        runSession(unitInstance);
+    public void run(Unit u) {
+        run(new UnitInstance.Proto(u));
     }
 
     @Override
-    public void run(UnitInstance instance) {
-        runSession(instance);
+    public void run(UnitInstance.Proto proto) {
+        UnitInstance unitInstance = sessionFactory.createInstance(proto)
+                .orElseThrow(() -> new UnsupportedOperationException(
+                        "Unit type is not supported: " + proto.unit().getClass()));
+        runSession(unitInstance);
     }
 
     private void runSession(UnitInstance session) {
@@ -55,11 +54,18 @@ public class KieUnitExecutor implements UnitExecutor,
     }
 
     @Override
-    public void signal(UnitExecutor.Signal signal) {
-        UnitInstance instance = sessionFactory.createInstance(new UnitInstance.Proto(signal.unit(), signal.bindings()))
-                .orElseThrow(() -> new UnsupportedOperationException(
-                        "Unit type is not supported: " + signal.unit().getClass()));
-        signal.exec(instance, scheduler);
+    public void signal(Signal sig) {
+        if (sig instanceof Signal.Scoped) {
+            Signal.Scoped signal = (Signal.Scoped) sig;
+            UnitInstance instance = sessionFactory.createInstance(signal.proto())
+                    .orElseThrow(() -> new UnsupportedOperationException(
+                            "Unit type is not supported: " + signal.proto().unit().getClass()));
+            signal.exec(instance, scheduler);
+        } else if (sig instanceof Signal.Broacast) {
+            Signal.Broacast signal = (Signal.Broacast) sig;
+            signal.exec(scheduler);
+        }
+        // else discard
     }
 
     @Override

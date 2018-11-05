@@ -2,22 +2,19 @@ package org.drools.units.internal;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import org.drools.core.common.InternalWorkingMemory;
 import org.drools.core.datasources.CursoredDataSource;
 import org.drools.core.datasources.InternalDataSource;
 import org.drools.core.impl.InternalRuleUnitExecutor;
 import org.drools.core.spi.Activation;
+import org.drools.units.GuardedRuleUnitInstance;
 import org.drools.units.RuleUnitSignal;
 import org.kie.api.KieBase;
 import org.kie.api.Unit;
 import org.kie.api.UnitBinding;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
-import org.kie.api.UnitSchedulerSignal;
 import org.kie.api.internal.LegacySessionWrapper;
 import org.kie.api.logger.KieRuntimeLogger;
 import org.kie.api.runtime.KieSession;
@@ -38,7 +35,7 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
     @Override
     public int run(Class<? extends RuleUnit> ruleUnitClass) {
         Unit unit = createUnit(ruleUnitClass);
-        unitExecutor.run(unit, bindings());
+        unitExecutor.run(new UnitInstance.Proto(unit, bindings()));
         return 1;
     }
 
@@ -56,7 +53,7 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public int run(RuleUnit ruleUnit) {
-        unitExecutor.run((Unit) ruleUnit, bindings());
+        unitExecutor.run(new UnitInstance.Proto((Unit) ruleUnit, bindings()));
         return 1;
     }
 
@@ -111,67 +108,48 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void onSuspend() {
-        UnitSchedulerSignal signal = RuleUnitSignal.suspend();
-//        unitExecutor.scheduler.signal(signal);
+        UnitExecutor.Signal.Broacast signal = RuleUnitSignal.suspend();
+        unitExecutor.signal(signal);
     }
 
     @Override
     public void onResume() {
-        UnitSchedulerSignal signal = RuleUnitSignal.resume();
-//        unitExecutor.scheduler.signal(signal);
+        UnitExecutor.Signal.Broacast signal = RuleUnitSignal.resume();
+        unitExecutor.signal(signal);
     }
 
     @Override
     public void switchToRuleUnit(Class<? extends RuleUnit> ruleUnitClass, Activation activation) {
-        throw new UnsupportedOperationException();
-
-//        RuleUnit ruleUnit = unitExecutor.ruleUnitFactory.getOrCreateRuleUnit(this, ruleUnitClass);
-//        switchToRuleUnit(ruleUnit, activation);
+        switchToRuleUnit(createUnit(ruleUnitClass), activation);
     }
 
     @Override
     public void switchToRuleUnit(RuleUnit ruleUnit, Activation activation) {
-        throw new UnsupportedOperationException();
-
-//        RuleUnitSignal.YieldSignal yieldSignal =
-//                RuleUnitSignal.yield(
-//                        ruleUnitSessionFactory.create(ruleUnit),
-//                        activation.getRule().getRuleUnitClassName());
-//        unitExecutor.scheduler.signal(yieldSignal);
+        RuleUnitSignal.YieldSignal yieldSignal = RuleUnitSignal.yield(
+                new UnitInstance.Proto((Unit) ruleUnit, bindings()),
+                activation.getRule().getRuleUnitClassName());
+        unitExecutor.signal(yieldSignal);
     }
 
     @Override
     public void guardRuleUnit(Class<? extends RuleUnit> ruleUnitClass, Activation activation) {
-//        Unit guardRuleUnit = (Unit) ruleUnitFactory.getOrCreateRuleUnit(this, ruleUnitClass);
-        RuleUnitSignal.YieldSignal yieldSignal = RuleUnitSignal.yield(
-                createUnit(ruleUnitClass),
-                bindings(),
-                activation.getRule().getRuleUnitClassName());
-        unitExecutor.signal(yieldSignal);
-
-//        RuleUnit ruleUnit = unitExecutor.ruleUnitFactory.getOrCreateRuleUnit(this, ruleUnitClass);
-//        guardRuleUnit(ruleUnit, activation);
+        guardRuleUnit(createUnit(ruleUnitClass), activation);
     }
 
     @Override
     public void guardRuleUnit(RuleUnit ruleUnit, Activation activation) {
-        throw new UnsupportedOperationException();
-
-//        unitExecutor.ruleUnitFactory.registerUnit(this, ruleUnit);
-//        GuardedRuleUnitSession guard =
-//                ruleUnitSessionFactory.createGuard(ruleUnit);
-//        UnitSchedulerSignal signal =
-//                RuleUnitSignal.registerGuard(guard, activation);
-//        unitExecutor.scheduler.signal(signal);
+        RuleUnitSignal.RegisterGuardSignal registerGuardSignal =
+                RuleUnitSignal.registerGuard(
+                        new GuardedRuleUnitInstance.Proto((Unit) ruleUnit, bindings()),
+                        activation);
+        unitExecutor.signal(registerGuardSignal);
     }
 
     @Override
     public void cancelActivation(Activation activation) {
-        throw new UnsupportedOperationException();
-
-//        RuleUnitSignal.UnregisterGuardSignal signal =
-//                RuleUnitSignal.unregisterGuard(activation);
-//        unitExecutor.scheduler.signal(signal);
+        RuleUnitSignal.UnregisterGuardSignal signal =
+                RuleUnitSignal.unregisterGuard(activation);
+        unitExecutor.signal(signal);
     }
 
     @Override

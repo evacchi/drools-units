@@ -3,17 +3,14 @@ package org.drools.units;
 import java.util.Optional;
 
 import org.drools.core.spi.Activation;
-import org.kie.api.Unit;
-import org.kie.api.UnitBinding;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
 import org.kie.api.UnitScheduler;
-import org.kie.api.UnitSchedulerSignal;
 
 public interface RuleUnitSignal {
 
     static RegisterGuardSignal registerGuard(
-            GuardedRuleUnitSession guarded, Activation activation) {
+            GuardedRuleUnitInstance.Proto guarded, Activation activation) {
         return new RegisterGuardSignal(guarded, activation);
     }
 
@@ -21,36 +18,42 @@ public interface RuleUnitSignal {
         return new UnregisterGuardSignal(activation);
     }
 
-    static YieldSignal yield(Unit unit, UnitBinding[] bindings, String ruleUnitClassName) {
-        return new YieldSignal(unit, bindings, ruleUnitClassName);
+    static YieldSignal yield(UnitInstance.Proto proto, String ruleUnitClassName) {
+        return new YieldSignal(proto, ruleUnitClassName);
     }
 
-    static UnitSchedulerSignal suspend() {
+    static UnitExecutor.Signal.Broacast suspend() {
         return scheduler -> Optional.ofNullable(scheduler.current()).ifPresent(u -> u.unit().onSuspend());
     }
 
-    static UnitSchedulerSignal resume() {
+    static UnitExecutor.Signal.Broacast resume() {
         return scheduler -> Optional.ofNullable(scheduler.current()).ifPresent(u -> u.unit().onResume());
     }
 
-    class RegisterGuardSignal implements UnitSchedulerSignal {
+    class RegisterGuardSignal implements UnitExecutor.Signal.Scoped {
 
-        private final GuardedRuleUnitSession guarded;
+        private final GuardedRuleUnitInstance.Proto proto;
         private final Activation activation;
 
-        private RegisterGuardSignal(GuardedRuleUnitSession guarded, Activation activation) {
-            this.guarded = guarded;
+        private RegisterGuardSignal(GuardedRuleUnitInstance.Proto proto, Activation activation) {
+            this.proto = proto;
             this.activation = activation;
         }
 
         @Override
-        public void exec(UnitScheduler scheduler) {
+        public GuardedRuleUnitInstance.Proto proto() {
+            return proto;
+        }
+
+        @Override
+        public void exec(UnitInstance instance, UnitScheduler scheduler) {
+            GuardedRuleUnitInstance guarded = (GuardedRuleUnitInstance) instance;
             scheduler.current().references().add(guarded);
             guarded.addActivation(activation);
         }
     }
 
-    class UnregisterGuardSignal implements UnitSchedulerSignal {
+    class UnregisterGuardSignal implements UnitExecutor.Signal.Broacast {
 
         private final Activation activation;
 
@@ -62,29 +65,24 @@ public interface RuleUnitSignal {
         public void exec(UnitScheduler scheduler) {
             scheduler.current().references()
                     .stream()
-                    .filter(u -> u instanceof GuardedRuleUnitSession)
-                    .forEach(u -> ((GuardedRuleUnitSession) u).removeActivation(activation));
+                    .filter(u -> u instanceof GuardedRuleUnitInstance)
+                    .forEach(u -> ((GuardedRuleUnitInstance) u).removeActivation(activation));
         }
     }
 
-    class YieldSignal implements UnitExecutor.Signal {
+    class YieldSignal implements UnitExecutor.Signal.Scoped {
 
-        private final Unit unit;
-        private final UnitBinding[] bindings;
+        private final UnitInstance.Proto proto;
         private final String ruleUnitClassName;
 
-        private YieldSignal(Unit unit, UnitBinding[] bindings, String ruleUnitClassName) {
-            this.unit = unit;
-            this.bindings = bindings;
+        private YieldSignal(UnitInstance.Proto proto, String ruleUnitClassName) {
+            this.proto = proto;
             this.ruleUnitClassName = ruleUnitClassName;
         }
 
-        public Unit unit() {
-            return unit;
-        }
-
-        public UnitBinding[] bindings() {
-            return bindings;
+        @Override
+        public UnitInstance.Proto proto() {
+            return proto;
         }
 
         @Override
@@ -96,8 +94,6 @@ public interface RuleUnitSignal {
             scheduler.scheduleAfter(
                     instance,
                     us -> us.unit().getClass().getName().equals(ruleUnitClassName));
-
         }
     }
-
 }

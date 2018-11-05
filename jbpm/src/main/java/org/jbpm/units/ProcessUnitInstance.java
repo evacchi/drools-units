@@ -58,7 +58,7 @@ public class ProcessUnitInstance implements UnitInstance {
     }
 
     @Override
-    public void signal(UnitSessionSignal signal) {
+    public void signal(UnitInstance.Signal signal) {
         if (signal instanceof Event) {
             Event sig = (Event) signal;
             processInstance.signalEvent(sig.type(), sig.payload());

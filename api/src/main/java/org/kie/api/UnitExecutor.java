@@ -7,17 +7,27 @@ public interface UnitExecutor {
      * until the system reaches a stable state
      */
 
-    void run(Unit unit, UnitBinding... bindings);
-
-    void run(UnitInstance instance);
+    void run(UnitInstance.Proto proto);
 
     UnitInstance current();
 
     void signal(Signal signal);
 
     interface Signal {
-        Unit unit();
-        UnitBinding[] bindings();
-        void exec(UnitInstance instance, UnitScheduler scheduler);
+
+        /**
+         * A signal that is scoped to an instance of the given Proto
+         */
+        interface Scoped extends Signal {
+            UnitInstance.Proto proto();
+            void exec(UnitInstance instance, UnitScheduler scheduler);
+        }
+
+        /**
+         * A signal that may have effect on any element of the scheduler
+         */
+        interface Broacast extends Signal {
+            void exec(UnitScheduler scheduler);
+        }
     }
 }

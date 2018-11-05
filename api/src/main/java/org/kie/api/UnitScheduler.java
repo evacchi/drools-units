@@ -77,13 +77,6 @@ public class UnitScheduler {
         current().halt();
     }
 
-    /**
-     * Sends an arbitrary signal to this scheduler
-     */
-    public void signal(UnitSchedulerSignal signal) {
-        signal.exec(this);
-    }
-
     @Override
     public String toString() {
         return "UnitScheduler(" + stackPointer + "::" + units + ")";

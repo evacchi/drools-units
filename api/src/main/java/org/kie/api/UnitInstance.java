@@ -30,14 +30,17 @@ public interface UnitInstance {
      */
     Collection<UnitInstance> references();
 
-    void signal(UnitSessionSignal signal);
+    void signal(Signal signal);
 
     void yield(UnitInstance next);
 
     State state();
 
+    interface Signal {
+        void exec(UnitInstance unitInstance);
+    }
 
-    final class Proto {
+    class Proto {
         private final Unit unit;
         private final UnitBinding[] bindings;
 
