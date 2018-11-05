@@ -35,4 +35,24 @@ public interface UnitInstance {
     void yield(UnitInstance next);
 
     State state();
+
+
+    final class Proto {
+        private final Unit unit;
+        private final UnitBinding[] bindings;
+
+        public Proto(Unit unit, UnitBinding... bindings) {
+            this.unit = unit;
+            this.bindings = bindings;
+        }
+
+        public Unit unit() {
+            return unit;
+        }
+
+        public UnitBinding[] bindings() {
+            return bindings;
+        }
+    }
+
 }

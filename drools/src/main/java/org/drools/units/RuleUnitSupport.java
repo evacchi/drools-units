@@ -6,7 +6,6 @@ import org.drools.core.impl.RuleUnitInternals.Factory;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.ruleunit.RuleUnitFactory;
 import org.drools.units.internal.LegacyRuleUnitExecutor;
-import org.kie.api.Unit;
 import org.kie.api.UnitBinding;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
@@ -30,14 +29,14 @@ public class RuleUnitSupport implements UnitSupport {
         this.delegate.bind(((StatefulKnowledgeSessionImpl) session).getKnowledgeBase());
     }
 
-    public Optional<UnitInstance> createInstance(Unit unit, UnitBinding... bindings) {
-        if (unit instanceof RuleUnit) {
+    public Optional<UnitInstance> createInstance(UnitInstance.Proto proto) {
+        if (proto.unit() instanceof RuleUnit) {
             RuleUnitInstance instance =
-                    delegate.create((RuleUnit) unit, bindings);
-            for (UnitBinding binding : bindings) {
+                    delegate.create((RuleUnit) proto.unit(), proto.bindings());
+            for (UnitBinding binding : proto.bindings()) {
                 ruleUnitFactory.bindVariable(binding.name(), binding.value());
             }
-            ruleUnitFactory.injectUnitVariables(legacyExecutor, unit);
+            ruleUnitFactory.injectUnitVariables(legacyExecutor, proto.unit());
             return Optional.of(instance);
         } else {
             return Optional.empty();

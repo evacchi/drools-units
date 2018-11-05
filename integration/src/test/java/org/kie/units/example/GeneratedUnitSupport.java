@@ -6,8 +6,6 @@ import org.drools.units.RuleUnit;
 import org.drools.units.RuleUnitSupport;
 import org.jbpm.units.ProcessUnit;
 import org.jbpm.units.ProcessUnitSupport;
-import org.kie.api.Unit;
-import org.kie.api.UnitBinding;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
 import org.kie.api.UnitSupport;
@@ -24,12 +22,12 @@ public class GeneratedUnitSupport implements UnitSupport {
     }
 
     @Override
-    public Optional<UnitInstance> createInstance(Unit unit, UnitBinding... bindings) {
-        if (unit instanceof ProcessUnit) {
-            return process.createInstance(unit);
+    public Optional<UnitInstance> createInstance(UnitInstance.Proto proto) {
+        if (proto.unit() instanceof ProcessUnit) {
+            return process.createInstance(proto);
         }
-        if (unit instanceof RuleUnit) {
-            return rule.createInstance(unit);
+        if (proto.unit() instanceof RuleUnit) {
+            return rule.createInstance(proto);
         }
         return Optional.empty();
     }

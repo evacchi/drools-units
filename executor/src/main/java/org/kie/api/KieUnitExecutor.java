@@ -29,7 +29,7 @@ public class KieUnitExecutor implements UnitExecutor,
 
     @Override
     public void run(Unit unit, UnitBinding... bindings) {
-        UnitInstance unitInstance = sessionFactory.createInstance(unit, bindings)
+        UnitInstance unitInstance = sessionFactory.createInstance(new UnitInstance.Proto(unit, bindings))
                 .orElseThrow(() -> new UnsupportedOperationException(
                         "Unit type is not supported: " + unit.getClass()));
         runSession(unitInstance);
@@ -56,7 +56,7 @@ public class KieUnitExecutor implements UnitExecutor,
 
     @Override
     public void signal(UnitExecutor.Signal signal) {
-        UnitInstance instance = sessionFactory.createInstance(signal.unit(), signal.bindings())
+        UnitInstance instance = sessionFactory.createInstance(new UnitInstance.Proto(signal.unit(), signal.bindings()))
                 .orElseThrow(() -> new UnsupportedOperationException(
                         "Unit type is not supported: " + signal.unit().getClass()));
         signal.exec(instance, scheduler);
