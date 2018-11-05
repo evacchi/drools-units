@@ -37,6 +37,35 @@ public class HelloUnit implements ProcessUnit {
     }
 
     @Override
+    public void onEnter() {
+        System.out.println(State.Entering);
+
+    }
+
+    @Override
+    public void onExit() {
+        System.out.println(State.Exiting);
+
+    }
+
+    @Override
+    public void onReEnter() {
+        System.out.println(State.ReEntering);
+
+    }
+
+    @Override
+    public void onFault(Throwable e) {
+        System.out.println(State.Faulted);
+    }
+
+    @Override
+    public void onAbort() {
+        System.out.println(State.Aborting);
+
+    }
+
+    @Override
     public void onResume() {
         System.out.println("RESUME");
     }

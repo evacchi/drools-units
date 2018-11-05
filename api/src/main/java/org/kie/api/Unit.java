@@ -27,6 +27,16 @@ public interface Unit extends org.kie.api.runtime.rule.RuleUnit {
 
     default void onCreate() {}
 
+    default void onEnter() {}
+
+    default void onExit() {}
+
+    default void onReEnter() {}
+
+    default void onFault(Throwable cause) {}
+
+    default void onAbort() {} // halt?
+
     public static class Identity extends RuleUnit.Identity {
 
         private final Class<?> cls;

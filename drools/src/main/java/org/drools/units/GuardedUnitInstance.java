@@ -27,7 +27,7 @@ public class GuardedUnitInstance implements UnitInstance {
 
     @Override
     public State state() {
-        return activations.isEmpty() ? State.Aborted : unitInstance.state();
+        return activations.isEmpty() ? State.Completed : unitInstance.state();
     }
 
     @Override

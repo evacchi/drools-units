@@ -10,12 +10,21 @@ import java.util.Collection;
  */
 public interface UnitInstance {
 
+
+    // start, enter, run, exit, end
+    // suspend, resume, re-enter, fault
+
     enum State {
         Created,
+        Entering,
         Running,
-        Suspended,
+        Exiting,
         Completed,
-        Aborted;
+        Suspended,
+        Resuming,
+        ReEntering,
+        Aborting, // halt
+        Faulted;
     }
 
     Unit unit();

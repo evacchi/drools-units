@@ -48,23 +48,28 @@ public class ProcessUnitSupport implements UnitSupport {
 
         @Override
         public void beforeProcessStarted(ProcessStartedEvent event) {
-
+            System.out.println("BEFORE START");
+            ProcessUnitInstance unitInstance =
+                    instances.get(event.getProcessInstance().getId());
+            transitionToState(unitInstance, UnitInstance.State.Entering);
         }
 
         @Override
         public void afterProcessStarted(ProcessStartedEvent event) {
-
         }
 
         @Override
         public void beforeProcessCompleted(ProcessCompletedEvent event) {
-
+            System.out.println("BEFORE COMPLETE");
+            ProcessUnitInstance unitInstance =
+                    instances.get(event.getProcessInstance().getId());
+            transitionToState(unitInstance, UnitInstance.State.Exiting);
         }
 
         @Override
         public void afterProcessCompleted(ProcessCompletedEvent event) {
             ProcessUnitInstance unitInstance =
-                    instances.remove(event.getProcessInstance().getId());
+                    instances.get(event.getProcessInstance().getId());
             transitionToState(unitInstance, UnitInstance.State.Completed);
         }
 
@@ -110,19 +115,36 @@ public class ProcessUnitSupport implements UnitSupport {
                 return;
             }
             instance.state = next;
+            ProcessUnit unit = instance.unit();
             switch (next) {
                 case Created:
-                    instance.unit().onCreate();
+                    unit.onCreate();
+                    break;
+                case Entering:
+                    unit.onEnter();
                     break;
                 case Running:
                     break;
                 case Suspended:
-                    instance.unit().onSuspend();
+                    unit.onSuspend();
+                    break;
+                case Exiting:
+                    unit.onExit();
                     break;
                 case Completed:
-                    instance.unit().onEnd();
+                    unit.onEnd();
                     break;
-                case Aborted:
+                case Resuming:
+                    unit.onResume();
+                    break;
+                case ReEntering:
+                    unit.onReEnter();
+                    break;
+                case Aborting:
+                    unit.onAbort();
+                    break;
+                case Faulted:
+                    unit.onFault(null);
                     break;
             }
         }
@@ -136,7 +158,7 @@ public class ProcessUnitSupport implements UnitSupport {
                 case STATE_COMPLETED:
                     return UnitInstance.State.Completed;
                 case STATE_ABORTED:
-                    return UnitInstance.State.Aborted;
+                    return UnitInstance.State.Completed; // fixme shall we support an Aborted state?
                 case STATE_SUSPENDED:
                     return UnitInstance.State.Suspended;
                 default:
