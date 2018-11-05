@@ -4,7 +4,7 @@ import org.drools.units.RuleUnitSupport;
 import org.junit.Test;
 import org.kie.api.KieUnitExecutor;
 
-public class RunUnitTest {
+public class NewRunUnitTest {
 
     @Test
     public void runHelloUnit() throws Exception {

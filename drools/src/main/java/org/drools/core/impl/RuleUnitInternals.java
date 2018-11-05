@@ -1,5 +1,6 @@
 package org.drools.core.impl;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -8,6 +9,7 @@ import org.drools.core.SessionConfigurationImpl;
 import org.drools.core.common.AgendaGroupQueueImpl;
 import org.drools.core.common.InternalAgenda;
 import org.drools.core.common.InternalAgendaGroup;
+import org.drools.core.datasources.InternalDataSource;
 import org.drools.core.event.AgendaEventSupport;
 import org.drools.core.event.RuleEventListenerSupport;
 import org.drools.core.event.RuleRuntimeEventSupport;
@@ -16,12 +18,14 @@ import org.drools.units.GuardedRuleUnitSession;
 import org.drools.units.RuleUnit;
 import org.drools.units.RuleUnitInstance;
 import org.drools.units.internal.LegacyRuleUnitExecutor;
-import org.drools.units.internal.LegacyRuleUnitFactory;
+import org.kie.api.UnitBinding;
 import org.kie.api.KieBase;
 import org.kie.api.UnitInstance;
+import org.kie.api.runtime.rule.DataSource;
 import org.kie.api.runtime.rule.FactHandle;
 
 import static org.drools.core.ruleunit.RuleUnitUtil.RULE_UNIT_ENTRY_POINT;
+import static org.drools.core.util.ClassUtils.isAssignable;
 
 public class RuleUnitInternals {
 
@@ -72,14 +76,14 @@ public class RuleUnitInternals {
         private final EntryPoint entryPoint;
         private final Registry registry;
         private InternalKnowledgeBase kiebase;
-        public final LegacyRuleUnitFactory ruleUnitFactory;
+//        public final LegacyRuleUnitFactory ruleUnitFactory;
 
         public Factory(StatefulKnowledgeSessionImpl session) {
             this.session = session;
             this.kiebase = (InternalKnowledgeBase) session.getKieBase();
             this.entryPoint = new EntryPoint(session);
             this.registry = new Registry();
-            this.ruleUnitFactory = new LegacyRuleUnitFactory();
+//            this.ruleUnitFactory = new LegacyRuleUnitFactory();
 
             this.session.init(
                     new SessionConfigurationImpl(),
@@ -98,12 +102,12 @@ public class RuleUnitInternals {
         /**
          * Instantiates a session for the given unit
          */
-        public RuleUnitInstance create(RuleUnit ruleUnit) {
-            RuleUnit unit = ruleUnitFactory.injectUnitVariables(
-                    session.ruleUnitExecutor, ruleUnit);
+        public RuleUnitInstance create(RuleUnit ruleUnit, UnitBinding... binding) {
+//            RuleUnit unit = ruleUnitFactory.injectUnitVariables(
+//                    session.ruleUnitExecutor, ruleUnit);
 
             return registry.register(new RuleUnitInstance(
-                    unit,
+                    ruleUnit,
                     session,
                     entryPoint));
         }
@@ -150,7 +154,7 @@ public class RuleUnitInternals {
             AgendaGroupQueueImpl unitGroup =
                     (AgendaGroupQueueImpl) session.getAgenda().getAgendaGroup(EMPTY_AGENDA);
             unitGroup.setAutoDeactivate(false);
-//            unitGroup.setKeepWhenEmpty(true);
+            unitGroup.setKeepWhenEmpty(true);
             unitGroup.setFocus();
         }
     }

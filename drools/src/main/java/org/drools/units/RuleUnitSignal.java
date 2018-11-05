@@ -2,8 +2,10 @@ package org.drools.units;
 
 import java.util.Optional;
 
-import org.drools.units.GuardedRuleUnitSession;
 import org.drools.core.spi.Activation;
+import org.kie.api.Unit;
+import org.kie.api.UnitBinding;
+import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
 import org.kie.api.UnitScheduler;
 import org.kie.api.UnitSchedulerSignal;
@@ -19,8 +21,8 @@ public interface RuleUnitSignal {
         return new UnregisterGuardSignal(activation);
     }
 
-    static YieldSignal yield(UnitInstance session, String ruleUnitClassName) {
-        return new YieldSignal(session, ruleUnitClassName);
+    static YieldSignal yield(Unit unit, UnitBinding[] bindings, String ruleUnitClassName) {
+        return new YieldSignal(unit, bindings, ruleUnitClassName);
     }
 
     static UnitSchedulerSignal suspend() {
@@ -65,26 +67,36 @@ public interface RuleUnitSignal {
         }
     }
 
-    class YieldSignal implements UnitSchedulerSignal {
+    class YieldSignal implements UnitExecutor.Signal {
 
-        private final UnitInstance session;
+        private final Unit unit;
+        private final UnitBinding[] bindings;
         private final String ruleUnitClassName;
 
-        private YieldSignal(UnitInstance session, String ruleUnitClassName) {
-            this.session = session;
+        private YieldSignal(Unit unit, UnitBinding[] bindings, String ruleUnitClassName) {
+            this.unit = unit;
+            this.bindings = bindings;
             this.ruleUnitClassName = ruleUnitClassName;
         }
 
+        public Unit unit() {
+            return unit;
+        }
+
+        public UnitBinding[] bindings() {
+            return bindings;
+        }
+
         @Override
-        public void exec(UnitScheduler scheduler) {
+        public void exec(UnitInstance instance, UnitScheduler scheduler) {
             UnitInstance current = scheduler.current();
             if (current != null) {
-                throw new UnsupportedOperationException();
-                //current.yield(session.unit());
+                current.yield(instance);
             }
             scheduler.scheduleAfter(
-                    session,
+                    instance,
                     us -> us.unit().getClass().getName().equals(ruleUnitClassName));
+
         }
     }
 

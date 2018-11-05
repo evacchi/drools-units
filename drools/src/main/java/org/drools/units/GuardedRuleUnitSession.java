@@ -6,8 +6,6 @@ import java.util.Set;
 import org.drools.core.impl.RuleUnitInternals.EntryPoint;
 import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.spi.Activation;
-import org.drools.units.RuleUnit;
-import org.drools.units.RuleUnitInstance;
 
 public class GuardedRuleUnitSession extends RuleUnitInstance {
 

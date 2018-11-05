@@ -1,16 +1,24 @@
 package org.drools.units.internal;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
+import org.drools.core.common.InternalWorkingMemory;
+import org.drools.core.datasources.CursoredDataSource;
 import org.drools.core.datasources.InternalDataSource;
 import org.drools.core.impl.InternalRuleUnitExecutor;
-import org.drools.core.impl.RuleUnitInternals.Factory;
 import org.drools.core.spi.Activation;
 import org.drools.units.RuleUnitSignal;
 import org.kie.api.KieBase;
 import org.kie.api.Unit;
+import org.kie.api.UnitBinding;
 import org.kie.api.UnitExecutor;
+import org.kie.api.UnitInstance;
 import org.kie.api.UnitSchedulerSignal;
+import org.kie.api.internal.LegacySessionWrapper;
 import org.kie.api.logger.KieRuntimeLogger;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.ObjectFilter;
@@ -21,33 +29,45 @@ import org.kie.api.runtime.rule.RuleUnitExecutor;
 public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     private final UnitExecutor unitExecutor;
-    private final Factory ruleUnitSessionFactory;
+    private HashMap<String, UnitBinding> bindings = new HashMap<>();
 
-    public LegacyRuleUnitExecutor(UnitExecutor unitExecutor, Factory ruleUnitSessionFactory) {
+    public LegacyRuleUnitExecutor(UnitExecutor unitExecutor) {
         this.unitExecutor = unitExecutor;
-        this.ruleUnitSessionFactory = ruleUnitSessionFactory;
     }
 
     @Override
     public int run(Class<? extends RuleUnit> ruleUnitClass) {
-        throw new UnsupportedOperationException();
+        Unit unit = createUnit(ruleUnitClass);
+        unitExecutor.run(unit, bindings());
+        return 1;
+    }
+
+    private Unit createUnit(Class<? extends RuleUnit> ruleUnitClass) {
+        try {
+            return (Unit) ruleUnitClass.getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
+    private UnitBinding[] bindings() {
+        return bindings.values().toArray(new UnitBinding[0]);
     }
 
     @Override
     public int run(RuleUnit ruleUnit) {
-        unitExecutor.run((Unit) ruleUnit);
+        unitExecutor.run((Unit) ruleUnit, bindings());
         return 1;
     }
 
     @Override
     public RuleUnitExecutor bind(KieBase kiebase) {
-//        unitExecutor.bind(kiebase);
         return this;
     }
 
     @Override
     public KieSession getKieSession() {
-        throw new UnsupportedOperationException();
+        return ((LegacySessionWrapper) unitExecutor).getSession();
     }
 
     @Override
@@ -67,13 +87,21 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public <T> DataSource<T> newDataSource(String name, T... items) {
-        throw new UnsupportedOperationException();
+        CursoredDataSource<T> dataSource = new CursoredDataSource<>((InternalWorkingMemory) getKieSession());
+        for (T item : items) {
+            dataSource.insert(item);
+        }
+        bindVariable(name, dataSource);
+        return dataSource;
     }
 
     @Override
     public RuleUnitExecutor bindVariable(String name, Object value) {
-//        return this;
-        throw new UnsupportedOperationException();
+        this.bindings.put(name, new UnitBinding(name, value));
+        if (value instanceof InternalDataSource) {
+            bindDataSource((InternalDataSource) value);
+        }
+        return this;
     }
 
     @Override
@@ -95,12 +123,16 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void switchToRuleUnit(Class<? extends RuleUnit> ruleUnitClass, Activation activation) {
+        throw new UnsupportedOperationException();
+
 //        RuleUnit ruleUnit = unitExecutor.ruleUnitFactory.getOrCreateRuleUnit(this, ruleUnitClass);
 //        switchToRuleUnit(ruleUnit, activation);
     }
 
     @Override
     public void switchToRuleUnit(RuleUnit ruleUnit, Activation activation) {
+        throw new UnsupportedOperationException();
+
 //        RuleUnitSignal.YieldSignal yieldSignal =
 //                RuleUnitSignal.yield(
 //                        ruleUnitSessionFactory.create(ruleUnit),
@@ -110,12 +142,21 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void guardRuleUnit(Class<? extends RuleUnit> ruleUnitClass, Activation activation) {
+//        Unit guardRuleUnit = (Unit) ruleUnitFactory.getOrCreateRuleUnit(this, ruleUnitClass);
+        RuleUnitSignal.YieldSignal yieldSignal = RuleUnitSignal.yield(
+                createUnit(ruleUnitClass),
+                bindings(),
+                activation.getRule().getRuleUnitClassName());
+        unitExecutor.signal(yieldSignal);
+
 //        RuleUnit ruleUnit = unitExecutor.ruleUnitFactory.getOrCreateRuleUnit(this, ruleUnitClass);
 //        guardRuleUnit(ruleUnit, activation);
     }
 
     @Override
     public void guardRuleUnit(RuleUnit ruleUnit, Activation activation) {
+        throw new UnsupportedOperationException();
+
 //        unitExecutor.ruleUnitFactory.registerUnit(this, ruleUnit);
 //        GuardedRuleUnitSession guard =
 //                ruleUnitSessionFactory.createGuard(ruleUnit);
@@ -126,6 +167,8 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void cancelActivation(Activation activation) {
+        throw new UnsupportedOperationException();
+
 //        RuleUnitSignal.UnregisterGuardSignal signal =
 //                RuleUnitSignal.unregisterGuard(activation);
 //        unitExecutor.scheduler.signal(signal);
@@ -133,9 +176,8 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public RuleUnit getCurrentRuleUnit() {
-//        UnitSession current = unitExecutor.scheduler.current();
-//        return current == null ? null : current.unit();
-        throw new UnsupportedOperationException();
+        UnitInstance current = unitExecutor.current();
+        return current == null ? null : current.unit();
     }
 
     @Override
@@ -174,6 +216,6 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void bindDataSource(InternalDataSource dataSource) {
-        throw new UnsupportedOperationException();//unitExecutor.bindDataSource(dataSource);
+        dataSource.setWorkingMemory((InternalWorkingMemory) getKieSession());
     }
 }

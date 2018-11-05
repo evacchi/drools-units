@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.kie.api.Unit;
+import org.kie.api.UnitBinding;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
 import org.kie.api.UnitSupport;
@@ -34,7 +35,7 @@ public class ProcessUnitSupport implements UnitSupport {
         this.instances = new HashMap<>();
     }
 
-    public Optional<UnitInstance> createInstance(Unit unit) {
+    public Optional<UnitInstance> createInstance(Unit unit, UnitBinding... bindings) {
         if (unit instanceof ProcessUnit) {
             ProcessUnitInstance instance =
                     new ProcessUnitInstance((ProcessUnit) unit, session);

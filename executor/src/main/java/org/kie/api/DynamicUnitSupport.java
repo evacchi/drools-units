@@ -21,7 +21,7 @@ public class DynamicUnitSupport implements UnitSupport {
         this.unitInstanceFactories = unitInstanceFactories;
     }
 
-    public Optional<UnitInstance> createInstance(Unit unit) {
+    public Optional<UnitInstance> createInstance(Unit unit, UnitBinding... bindings) {
         return unitInstanceFactories.stream()
                 .map(factory -> factory.createInstance(unit))
                 .filter(Optional::isPresent)

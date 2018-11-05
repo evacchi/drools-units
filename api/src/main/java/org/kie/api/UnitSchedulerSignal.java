@@ -1,5 +1,9 @@
 package org.kie.api;
 
 public interface UnitSchedulerSignal {
-    void exec(UnitScheduler scheduler);
+
+//    Unit unit();
+
+    void exec(//UnitInstance session,
+     UnitScheduler scheduler);
 }

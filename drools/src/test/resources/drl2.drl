@@ -1,0 +1,16 @@
+package org.drools.units.example.models
+unit TicketIssuerUnit;
+import org.drools.units.example.models.Person
+import org.drools.units.example.models.AdultTicket
+rule IssueAdultTicket when
+    $p: /persons[ age >= 18 ]
+then
+    System.out.println("there is mature audience");
+    tickets.insert(new AdultTicket($p));
+end
+rule RegisterAdultTicket when
+    $t: /tickets
+then
+    System.out.println("tickets");
+    results.add( $t.getPerson().getName() );
+end
