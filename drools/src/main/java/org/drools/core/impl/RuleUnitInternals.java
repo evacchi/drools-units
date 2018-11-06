@@ -147,7 +147,7 @@ public class RuleUnitInternals {
             AgendaGroupQueueImpl unitGroup =
                     (AgendaGroupQueueImpl) session.getAgenda().getAgendaGroup(EMPTY_AGENDA);
             unitGroup.setAutoDeactivate(false);
-            unitGroup.setKeepWhenEmpty(true);
+            //unitGroup.setKeepWhenEmpty(true);
             unitGroup.setFocus();
         }
     }
