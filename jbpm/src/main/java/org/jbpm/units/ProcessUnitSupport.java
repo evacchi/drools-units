@@ -48,10 +48,9 @@ public class ProcessUnitSupport implements UnitSupport {
 
         @Override
         public void beforeProcessStarted(ProcessStartedEvent event) {
-            System.out.println("BEFORE START");
-            ProcessUnitInstance unitInstance =
-                    instances.get(event.getProcessInstance().getId());
-            transitionToState(unitInstance, UnitInstance.State.Entering);
+//            ProcessUnitInstance unitInstance =
+//                    instances.get(event.getProcessInstance().getId());
+//            transitionToState(unitInstance, UnitInstance.State.Entering);
         }
 
         @Override
@@ -60,7 +59,6 @@ public class ProcessUnitSupport implements UnitSupport {
 
         @Override
         public void beforeProcessCompleted(ProcessCompletedEvent event) {
-            System.out.println("BEFORE COMPLETE");
             ProcessUnitInstance unitInstance =
                     instances.get(event.getProcessInstance().getId());
             transitionToState(unitInstance, UnitInstance.State.Exiting);

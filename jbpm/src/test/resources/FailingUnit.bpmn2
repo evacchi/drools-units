@@ -11,12 +11,12 @@
              xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
              xmlns:tns="http://www.jboss.org/drools">
 
-  <process processType="Private" isExecutable="true" id="org.jbpm.example.HelloUnit" name="Hello World" >
+  <process processType="Private" isExecutable="true" id="org.jbpm.example.FailingUnit" name="Failing Unit" >
 
     <!-- nodes -->
     <startEvent id="_1" name="StartProcess" />
-    <scriptTask id="_2" name="Hello" >
-      <script>System.out.println("PROCESS SAYS: Hello World");</script>
+    <scriptTask id="_2" name="Failure" scriptFormat="http://www.java.com/java">
+      <script>throw new IllegalStateException();</script>
     </scriptTask>
     <endEvent id="_3" name="EndProcess" >
       <terminateEventDefinition/>

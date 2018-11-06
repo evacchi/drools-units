@@ -45,9 +45,20 @@ public class ProcessUnitInstance implements UnitInstance {
     }
 
     public void start() {
-        processUnit.onStart();
-        session.startProcessInstance(processInstance.getId());
-        variableBinder.updateBindings(processInstance);
+        try {
+            this.state = State.Entering;
+            processUnit.onEnter();
+            this.state = State.Running;
+            processUnit.onStart();
+            session.startProcessInstance(processInstance.getId());
+        } catch (Throwable t) {
+            this.state = State.Faulted;
+            processUnit.onFault(t);
+            this.state = State.Completed;
+            processUnit.onEnd();
+        } finally {
+            variableBinder.updateBindings(processInstance);
+        }
     }
 
     @Override
