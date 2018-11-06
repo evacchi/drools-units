@@ -1,0 +1,13 @@
+package org.drools.units.example.models
+unit BoxOfficeUnit;
+import org.drools.units.example.models.BoxOffice
+import org.drools.units.example.models.TicketIssuerUnit
+
+rule BoxOfficeIsOpen no-loop when
+//    $str: String( )
+    $box: /boxOffices[ open ]
+then
+    System.out.println("Box office is open!");
+    drools.guard( TicketIssuerUnit.class );
+    insert("bar");
+end

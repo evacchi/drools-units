@@ -1,0 +1,12 @@
+package org.drools.units.example.models
+unit CinemaUnit;
+import org.drools.units.example.models.Cinema
+import org.drools.units.example.models.BoxOfficeUnit
+
+rule CinemaIsOpen when
+    $str: String( this == "foo" )
+    $box: /cinema[ open ]
+then
+    System.out.println("CINEMA is open!");
+    drools.guard( BoxOfficeUnit.class );
+end
