@@ -27,6 +27,12 @@ public class KieUnitExecutor implements UnitExecutor,
         return new KieUnitExecutor(session, factory);
     }
 
+    public static KieUnitExecutor create(KieBase kieBase, UnitSupport.Provider factory) {
+        KieSession session = kieBase.newKieSession();
+        return new KieUnitExecutor(session, factory);
+    }
+
+
     public void run(Unit u) {
         run(new UnitInstance.Proto(u));
     }

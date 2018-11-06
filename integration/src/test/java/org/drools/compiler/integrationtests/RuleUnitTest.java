@@ -2345,8 +2345,14 @@ public class RuleUnitTest {
         executor.run(emptyUnit);
     }
 
-    private RuleUnitExecutor ruleUnitExecutor() {
+    static class Stub {
+        RuleUnitExecutor bind(KieBase kieBase) {
+            return new LegacyRuleUnitExecutor(KieUnitExecutor.create(kieBase, RuleUnitSupport::new));
+        }
+    }
+
+    private Stub ruleUnitExecutor() {
 //        return RuleUnitExecutor.create();
-        return new LegacyRuleUnitExecutor(KieUnitExecutor.create(RuleUnitSupport::new));
+        return new Stub();
     }
 }
