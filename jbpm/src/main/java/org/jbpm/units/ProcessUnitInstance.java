@@ -66,6 +66,12 @@ public class ProcessUnitInstance implements UnitInstance {
         session.abortProcessInstance(id());
     }
 
+    @Override
+    public void resume() {
+        state = State.Resuming;
+        processUnit.onResume();
+    }
+
     public long id() {
         return processInstance.getId();
     }

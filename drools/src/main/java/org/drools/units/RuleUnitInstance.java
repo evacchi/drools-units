@@ -18,34 +18,11 @@ public class RuleUnitInstance implements UnitInstance {
 
     interface Signal extends UnitInstance.Signal {
 
+
     }
 
     private boolean yielded = false;
-
-    @Override
-    public Unit unit() {
-        return ruleUnit;
-    }
-
-    @Override
-    public void start() {
-        fireAllRules();
-    }
-
-    @Override
-    public void halt() {
-        unbindRuleUnit();
-    }
-
-    public void fireUntilHalt() {
-        bindRuleUnit();
-        try {
-            session.fireUntilHalt();
-        } finally {
-            unbindRuleUnit();
-        }
-    }
-
+    private State state;
     private final StatefulKnowledgeSessionImpl session;
     private final Agenda agenda;
     private final EntryPoint entryPoint;
@@ -63,20 +40,53 @@ public class RuleUnitInstance implements UnitInstance {
         this.session = session;
         this.agenda = new Agenda(session);
         this.entryPoint = entryPoint;
+
+        this.state = State.Created;
+        unit.onCreate();
     }
 
-    public int fireAllRules() {
+
+    @Override
+    public Unit unit() {
+        return ruleUnit;
+    }
+
+    @Override
+    public void start() {
         bindRuleUnit();
         try {
-            return session.fireAllRules();
+            state = State.Running;
+            ruleUnit.onStart();
+            session.fireAllRules();
         } finally {
             unbindRuleUnit();
         }
     }
 
+    @Override
+    public void halt() {
+        unbindRuleUnit();
+    }
+
+    public void resume() {
+        state = State.Resuming;
+        ruleUnit.onResume();
+    }
+
+    public void fireUntilHalt() {
+        bindRuleUnit();
+        try {
+            session.fireUntilHalt();
+        } finally {
+            unbindRuleUnit();
+        }
+    }
+
+
     public void bindRuleUnit() {
         suspended.set(false);
-        ruleUnit.onStart();
+        state = State.Entering;
+        ruleUnit.onEnter();
 
         entryPoint.bind(ruleUnit);
 
@@ -102,9 +112,9 @@ public class RuleUnitInstance implements UnitInstance {
     //    @Override
     public void yield(UnitInstance unit) {
         yielded = true;
-        ruleUnit.onYield(unit.unit());
+        this.ruleUnit.onYield(unit.unit());
         session.getPropagationList().flush();
-        agenda.unfocus(ruleUnit);
+        agenda.unfocus(this.ruleUnit);
     }
 
     //    @Override

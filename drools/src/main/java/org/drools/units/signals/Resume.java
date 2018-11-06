@@ -3,6 +3,7 @@ package org.drools.units.signals;
 import java.util.Optional;
 
 import org.kie.api.UnitExecutor;
+import org.kie.api.UnitInstance;
 import org.kie.api.UnitScheduler;
 
 public class Resume implements UnitExecutor.Signal.Broacast {
@@ -11,6 +12,6 @@ public class Resume implements UnitExecutor.Signal.Broacast {
 
     @Override
     public void exec(UnitScheduler scheduler) {
-        Optional.ofNullable(scheduler.current()).ifPresent(u -> u.unit().onResume());
+        Optional.ofNullable(scheduler.current()).ifPresent(UnitInstance::resume);
     }
 }

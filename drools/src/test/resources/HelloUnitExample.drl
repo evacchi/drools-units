@@ -6,6 +6,6 @@ unit HelloUnit
 rule HelloUnitRule when
     $p : /name
 then
-    System.out.println("Hello, " + $p);
+    System.out.println("MESSAGE FROM RULE: Hello, " + $p);
 end
 

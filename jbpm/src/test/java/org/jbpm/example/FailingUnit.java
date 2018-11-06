@@ -18,6 +18,11 @@ public class FailingUnit implements ProcessUnit {
     }
 
     @Override
+    public void onEnter() {
+        log(State.Entering);
+    }
+
+    @Override
     public void onStart() {
         log(State.Running);
     }
@@ -30,11 +35,6 @@ public class FailingUnit implements ProcessUnit {
     @Override
     public void onSuspend() {
         log(State.Suspended);
-    }
-
-    @Override
-    public void onEnter() {
-        log(State.Entering);
     }
 
     @Override

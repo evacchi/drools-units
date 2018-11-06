@@ -51,6 +51,11 @@ public class GuardedUnitInstance implements UnitInstance {
     }
 
     @Override
+    public void resume() {
+        unitInstance.resume();
+    }
+
+    @Override
     public Collection<UnitInstance> references() {
         return unitInstance.references();
     }

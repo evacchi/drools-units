@@ -43,6 +43,8 @@ public interface UnitInstance {
 
     void yield(UnitInstance next);
 
+    void resume();
+
     State state();
 
     interface Signal {
