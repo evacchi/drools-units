@@ -63,8 +63,7 @@ public class UnitScheduler {
         }
         stackPointer = units.poll();
         while (stackPointer != null &&
-                stackPointer.state() != UnitInstance.State.Created &&
-                stackPointer.state() != UnitInstance.State.Running) {
+                stackPointer.state() == UnitInstance.State.Suspended) {
             stackPointer = units.poll();
         }
         return stackPointer;

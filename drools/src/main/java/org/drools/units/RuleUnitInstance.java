@@ -21,7 +21,6 @@ public class RuleUnitInstance implements UnitInstance {
 
     }
 
-    private boolean yielded = false;
     private State state;
     private final StatefulKnowledgeSessionImpl session;
     private final Agenda agenda;
@@ -29,8 +28,6 @@ public class RuleUnitInstance implements UnitInstance {
     private RuleUnit ruleUnit;
     private RuleUnitDescription ruleUnitDescr;
     private final Set<UnitInstance> references = new HashSet<>();
-
-    private AtomicBoolean suspended = new AtomicBoolean(false);
 
     public RuleUnitInstance(
             RuleUnit unit,
@@ -68,9 +65,22 @@ public class RuleUnitInstance implements UnitInstance {
         unbindRuleUnit();
     }
 
+    @Override
+    public void suspend() {
+        if (state != State.Suspended) {
+            state = State.Suspended;
+            ruleUnit.onSuspend();
+        }
+    }
+
+    @Override
     public void resume() {
-        state = State.Resuming;
-        ruleUnit.onResume();
+        if (state == State.Suspended) {
+            state = State.Resuming;
+            ruleUnit.onResume();
+            state = State.ReEntering;
+            ruleUnit.onReEnter();
+        }
     }
 
     public void fireUntilHalt() {
@@ -84,7 +94,6 @@ public class RuleUnitInstance implements UnitInstance {
 
 
     public void bindRuleUnit() {
-        suspended.set(false);
         state = State.Entering;
         ruleUnit.onEnter();
 
@@ -99,19 +108,21 @@ public class RuleUnitInstance implements UnitInstance {
     }
 
     private void unbindRuleUnit() {
-        if (yielded) {
-            yielded = false;
+        if (state == State.Suspended) {
             return;
         }
         ruleUnitDescr.unbindDataSources(session, ruleUnit);
-        (getGlobalResolver()).setDelegate(null);
+        getGlobalResolver().setDelegate(null);
+        state = State.Exiting;
+        ruleUnit.onExit();
+        state = State.Completed;
         ruleUnit.onEnd();
-        suspended.set(true);
     }
 
-    //    @Override
+    @Override
     public void yield(UnitInstance unit) {
-        yielded = true;
+        state = State.Suspended;
+        this.ruleUnit.onSuspend();
         this.ruleUnit.onYield(unit.unit());
         session.getPropagationList().flush();
         agenda.unfocus(this.ruleUnit);

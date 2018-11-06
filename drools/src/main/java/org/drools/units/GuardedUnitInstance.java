@@ -51,6 +51,11 @@ public class GuardedUnitInstance implements UnitInstance {
     }
 
     @Override
+    public void suspend() {
+        unitInstance.suspend();
+    }
+
+    @Override
     public void resume() {
         unitInstance.resume();
     }

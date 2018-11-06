@@ -67,6 +67,12 @@ public class ProcessUnitInstance implements UnitInstance {
     }
 
     @Override
+    public void suspend() {
+        state = State.Suspended;
+        processUnit.onSuspend();
+    }
+
+    @Override
     public void resume() {
         state = State.Resuming;
         processUnit.onResume();

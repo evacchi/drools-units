@@ -10,10 +10,8 @@ import java.util.Collection;
  */
 public interface UnitInstance {
 
-
     // start, enter, run, exit, end
     // suspend, resume, re-enter, fault
-
     enum State {
         Created,
         Entering,
@@ -43,6 +41,8 @@ public interface UnitInstance {
 
     void yield(UnitInstance next);
 
+    void suspend();
+
     void resume();
 
     State state();
@@ -52,6 +52,7 @@ public interface UnitInstance {
     }
 
     final class Proto {
+
         private final Unit unit;
         private final UnitBinding[] bindings;
 
@@ -68,5 +69,4 @@ public interface UnitInstance {
             return bindings;
         }
     }
-
 }
