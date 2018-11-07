@@ -11,13 +11,12 @@
              xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
              xmlns:tns="http://www.jboss.org/drools">
 
-  <process processType="Private" isExecutable="true" id="org.jbpm.example.units.HelloVariableUnit" name="Hello World" >
+  <process processType="Private" isExecutable="true" id="org.jbpm.example.units.PausingUnit" name="Failing Unit" >
 
     <!-- nodes -->
     <startEvent id="_1" name="StartProcess" />
-    <scriptTask id="_2" name="Hello" >
-      <script>kcontext.setVariable("count", 100);</script>
-    </scriptTask>
+    <userTask id="_2" name="Human Task">
+    </userTask>
     <endEvent id="_3" name="EndProcess" >
       <terminateEventDefinition/>
     </endEvent>

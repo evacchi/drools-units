@@ -1,4 +1,4 @@
-package org.jbpm.example;
+package org.jbpm.example.units;
 
 import org.jbpm.units.ProcessUnit;
 

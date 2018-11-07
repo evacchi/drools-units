@@ -3,7 +3,6 @@ package org.drools.units;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.RuleUnitInternals.Agenda;
@@ -16,10 +15,7 @@ import org.kie.api.runtime.Globals;
 
 public class RuleUnitInstance implements UnitInstance {
 
-    interface Signal extends UnitInstance.Signal {
-
-
-    }
+    interface Signal extends UnitInstance.Signal { }
 
     private State state;
     private final StatefulKnowledgeSessionImpl session;
@@ -41,7 +37,6 @@ public class RuleUnitInstance implements UnitInstance {
         this.state = State.Created;
         unit.onCreate();
     }
-
 
     @Override
     public Unit unit() {
@@ -92,7 +87,6 @@ public class RuleUnitInstance implements UnitInstance {
         }
     }
 
-
     public void bindRuleUnit() {
         state = State.Entering;
         ruleUnit.onEnter();
@@ -100,7 +94,7 @@ public class RuleUnitInstance implements UnitInstance {
         entryPoint.bind(ruleUnit);
 
         InternalKnowledgeBase kieBase = (InternalKnowledgeBase) session.getKieBase();
-        this.ruleUnitDescr = kieBase.getRuleUnitDescriptionRegistry().getDescriptionForUnit(ruleUnit);
+        this.ruleUnitDescr = kieBase.getRuleUnitDescriptionRegistry().getDescription(ruleUnit);
         getGlobalResolver().setDelegate(new RuleUnitGlobals(ruleUnitDescr, ruleUnit));
         ruleUnitDescr.bindDataSources(session, ruleUnit);
 

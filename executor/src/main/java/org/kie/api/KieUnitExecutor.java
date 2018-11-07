@@ -1,6 +1,13 @@
 package org.kie.api;
 
+import java.util.Map;
+
+import org.drools.core.common.InternalKnowledgeRuntime;
+import org.drools.core.process.instance.WorkItemManager;
+import org.drools.core.process.instance.WorkItemManagerFactory;
+import org.drools.core.process.instance.impl.DefaultWorkItemManager;
 import org.kie.api.internal.LegacySessionWrapper;
+import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
 public class KieUnitExecutor implements UnitExecutor,
@@ -32,20 +39,20 @@ public class KieUnitExecutor implements UnitExecutor,
         return new KieUnitExecutor(session, factory);
     }
 
-
-    public void run(Unit u) {
-        run(new UnitInstance.Proto(u));
+    public UnitInstance run(Unit u) {
+        return run(new UnitInstance.Proto(u));
     }
 
     @Override
-    public void run(UnitInstance.Proto proto) {
+    public UnitInstance run(UnitInstance.Proto proto) {
         UnitInstance unitInstance = sessionFactory.createInstance(proto)
                 .orElseThrow(() -> new UnsupportedOperationException(
                         "Unit type is not supported: " + proto.unit().getClass()));
-        runSession(unitInstance);
+        run(unitInstance);
+        return unitInstance;
     }
 
-    private void runSession(UnitInstance session) {
+    public void run(UnitInstance session) {
         scheduler.schedule(session);
         session = scheduler.next();
         while (session != null) {

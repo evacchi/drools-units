@@ -1,4 +1,4 @@
-package org.jbpm.example;
+package org.jbpm.example.units;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.kie.api.UnitInstance.State;
 
 public class HelloUnit implements ProcessUnit {
     
-    List<State> stateSequence = new ArrayList<>();
+    public final List<State> stateSequence = new ArrayList<>();
 
     @Override
     public void onCreate() {

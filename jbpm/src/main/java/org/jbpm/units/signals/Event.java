@@ -6,7 +6,7 @@ import org.kie.api.UnitInstance;
 /**
  * Represents a process signal event
  */
-public class Event implements ProcessUnitInstance.Signal {
+public class Event implements UnitInstance.Signal {
 
     private final String type;
     private final Object payload;
@@ -26,6 +26,7 @@ public class Event implements ProcessUnitInstance.Signal {
 
     @Override
     public void exec(UnitInstance unitInstance) {
-        throw new UnsupportedOperationException("not yet implemented");
+        ProcessUnitInstance processUnitInstance = (ProcessUnitInstance) unitInstance;
+        processUnitInstance.processInstance.signalEvent(type, payload);
     }
 }

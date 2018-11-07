@@ -1,30 +1,24 @@
-package org.jbpm.example;
+package org.jbpm.example.units;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jbpm.units.ProcessUnit;
 import org.kie.api.Unit;
-import org.kie.api.UnitInstance;
 import org.kie.api.UnitInstance.State;
 
-public class FailingUnit implements ProcessUnit {
+public class PausingUnit implements ProcessUnit {
     
-    List<State> stateSequence = new ArrayList<>();
+    public final List<State> stateSequence = new ArrayList<>();
 
     @Override
-    public void onCreate() {
+    public void onStart() {
         log(State.Created);
     }
 
     @Override
     public void onEnter() {
         log(State.Entering);
-    }
-
-    @Override
-    public void onStart() {
-        log(State.Running);
     }
 
     @Override
@@ -50,6 +44,7 @@ public class FailingUnit implements ProcessUnit {
     @Override
     public void onFault(Throwable e) {
         log(State.Faulted);
+        e.printStackTrace();
     }
 
     @Override

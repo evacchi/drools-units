@@ -1,12 +1,15 @@
 package org.jbpm.units;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 
 import org.jbpm.units.internal.VariableBinder;
-import org.jbpm.units.signals.Event;
+import org.jbpm.workflow.instance.WorkflowProcessInstance;
 import org.kie.api.UnitInstance;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.process.EventListener;
 import org.kie.api.runtime.process.ProcessInstance;
 
 /**
@@ -19,10 +22,11 @@ public class ProcessUnitInstance implements UnitInstance {
 
     }
 
+    private final Deque<UnitInstance.Signal> pendingSignals;
     private final KieSession session;
     private final ProcessUnit processUnit;
     private final VariableBinder variableBinder;
-    final ProcessInstance processInstance;
+    public final WorkflowProcessInstance processInstance;
     State state;
 
     public ProcessUnitInstance(
@@ -33,11 +37,29 @@ public class ProcessUnitInstance implements UnitInstance {
         this.session = session;
         this.variableBinder = new VariableBinder(processUnit);
         this.processInstance =
-                session.createProcessInstance(
+                (WorkflowProcessInstance) session.createProcessInstance(
                         processId, variableBinder.asMap());
+        this.processInstance.addEventListener("workItemCompleted",
+                                              new EventListener() {
+
+                                                  private String[] eventTypes = {"workItemCompleted"};
+
+                                                  @Override
+                                                  public void signalEvent(String type, Object event) {
+                                                      state = State.Resuming;
+                                                  }
+
+                                                  @Override
+                                                  public String[] getEventTypes() {
+                                                      return eventTypes;
+                                                  }
+                                              }
+
+                , false);
 
         this.state = State.Created;
         this.processUnit.onCreate();
+        pendingSignals = new ArrayDeque<>();
     }
 
     public ProcessUnit unit() {
@@ -45,20 +67,50 @@ public class ProcessUnitInstance implements UnitInstance {
     }
 
     public void start() {
-        try {
-            this.state = State.Entering;
-            processUnit.onEnter();
-            this.state = State.Running;
-            processUnit.onStart();
-            session.startProcessInstance(processInstance.getId());
-        } catch (Throwable t) {
-            this.state = State.Faulted;
-            processUnit.onFault(t);
-            this.state = State.Completed;
-            processUnit.onEnd();
-        } finally {
-            variableBinder.updateBindings(processInstance);
+        nextState();
+        variableBinder.updateBindings(processInstance);
+    }
+
+    private void nextState() {
+        switch (state) {
+            case Created:
+                run();
+                if (processInstance.getState() == ProcessInstance.STATE_ACTIVE) {
+                    this.state = State.Suspended;
+                    processUnit.onSuspend();
+                }
+                break;
+            case Resuming:
+                resume();
+                break;
+            default:
+                throw new IllegalStateException(state.name());
         }
+    }
+
+//    private void run() {
+//        try {
+//            doRun();
+//        } catch (Throwable t) {
+//            fail(t);
+//        } finally {
+//            variableBinder.updateBindings(processInstance);
+//        }
+//    }
+
+    private void fail(Throwable t) {
+        this.state = State.Faulted;
+        processUnit.onFault(t);
+        this.state = State.Completed;
+        processUnit.onEnd();
+    }
+
+    private void run() {
+        processUnit.onStart();
+        this.state = State.Entering;
+        processUnit.onEnter();
+        this.state = State.Running;
+        session.startProcessInstance(processInstance.getId());
     }
 
     @Override
@@ -76,6 +128,14 @@ public class ProcessUnitInstance implements UnitInstance {
     public void resume() {
         state = State.Resuming;
         processUnit.onResume();
+        state = State.ReEntering;
+        processUnit.onReEnter();
+        this.state = State.Running;
+        UnitInstance.Signal sig = pendingSignals.poll();
+        while (sig != null) {
+            sig.exec(this);
+            sig = pendingSignals.poll();
+        }
     }
 
     public long id() {
@@ -84,10 +144,10 @@ public class ProcessUnitInstance implements UnitInstance {
 
     @Override
     public void signal(UnitInstance.Signal signal) {
-        if (signal instanceof Event) {
-            Event sig = (Event) signal;
-            processInstance.signalEvent(sig.type(), sig.payload());
+        if (signal instanceof ProcessUnitInstance.Signal) {
         }
+        pendingSignals.add( signal);
+        state = State.Resuming;
         // drop anything else
     }
 

@@ -7,7 +7,7 @@ public interface UnitExecutor {
      * until the system reaches a stable state
      */
 
-    void run(UnitInstance.Proto proto);
+    UnitInstance run(UnitInstance.Proto proto);
 
     UnitInstance current();
 
