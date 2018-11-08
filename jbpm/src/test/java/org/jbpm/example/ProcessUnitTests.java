@@ -1,5 +1,7 @@
 package org.jbpm.example;
 
+import java.util.Collections;
+
 import org.jbpm.example.units.FailingUnit;
 import org.jbpm.example.units.HelloUnit;
 import org.jbpm.example.units.HelloVariableUnit;
@@ -22,7 +24,6 @@ import static org.kie.api.UnitInstance.State.Entering;
 import static org.kie.api.UnitInstance.State.Exiting;
 import static org.kie.api.UnitInstance.State.Faulted;
 import static org.kie.api.UnitInstance.State.ReEntering;
-import static org.kie.api.UnitInstance.State.Running;
 import static org.kie.api.UnitInstance.State.Suspended;
 
 public class ProcessUnitTests {
@@ -58,11 +59,40 @@ public class ProcessUnitTests {
         assertEquals(u.getCount(), 100);
     }
 
+    @Test
+    public void pausedLifecycleShouldMatch() {
+        PausingUnit u = new PausingUnit();
+        KieUnitExecutor executor = KieUnitExecutor.create(
+                DynamicUnitSupport.register(
+                        ProcessUnitSupport::new));
+
+        KieSession session = executor.getSession();
+
+        MyWorkItemHandler handler = new MyWorkItemHandler();
+        WorkItemManager mgr = session.getWorkItemManager();
+        mgr.registerWorkItemHandler("Human Task", handler);
+
+        ProcessUnitInstance instance = (ProcessUnitInstance) executor.run(u);
+        assertEquals(asList(Created, Entering, Suspended),
+                     u.stateSequence);
+
+        u.stateSequence.clear();
+
+        mgr.completeWorkItem(handler.workItem.getId(), Collections.emptyMap());
+
+        executor.run(instance);
+        assertEquals(asList(ReEntering, Exiting, Completed),
+                     u.stateSequence);
+    }
+
     private static class MyWorkItemHandler implements WorkItemHandler {
+
+        WorkItem workItem;
 
         @Override
         public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
             System.out.println("execute work item");
+            this.workItem = workItem;
         }
 
         @Override

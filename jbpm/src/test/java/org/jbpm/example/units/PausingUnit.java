@@ -12,7 +12,7 @@ public class PausingUnit implements ProcessUnit {
     public final List<State> stateSequence = new ArrayList<>();
 
     @Override
-    public void onStart() {
+    public void onCreate() {
         log(State.Created);
     }
 

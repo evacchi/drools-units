@@ -9,7 +9,6 @@ import org.jbpm.units.internal.VariableBinder;
 import org.jbpm.workflow.instance.WorkflowProcessInstance;
 import org.kie.api.UnitInstance;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.process.EventListener;
 import org.kie.api.runtime.process.ProcessInstance;
 
 /**
@@ -26,7 +25,7 @@ public class ProcessUnitInstance implements UnitInstance {
     private final KieSession session;
     private final ProcessUnit processUnit;
     private final VariableBinder variableBinder;
-    public final WorkflowProcessInstance processInstance;
+    private final WorkflowProcessInstance processInstance;
     State state;
 
     public ProcessUnitInstance(
@@ -39,23 +38,6 @@ public class ProcessUnitInstance implements UnitInstance {
         this.processInstance =
                 (WorkflowProcessInstance) session.createProcessInstance(
                         processId, variableBinder.asMap());
-        this.processInstance.addEventListener("workItemCompleted",
-                                              new EventListener() {
-
-                                                  private String[] eventTypes = {"workItemCompleted"};
-
-                                                  @Override
-                                                  public void signalEvent(String type, Object event) {
-                                                      state = State.Resuming;
-                                                  }
-
-                                                  @Override
-                                                  public String[] getEventTypes() {
-                                                      return eventTypes;
-                                                  }
-                                              }
-
-                , false);
 
         this.state = State.Created;
         this.processUnit.onCreate();
@@ -67,11 +49,6 @@ public class ProcessUnitInstance implements UnitInstance {
     }
 
     public void start() {
-        nextState();
-        variableBinder.updateBindings(processInstance);
-    }
-
-    private void nextState() {
         switch (state) {
             case Created:
                 run();
@@ -82,13 +59,7 @@ public class ProcessUnitInstance implements UnitInstance {
             default:
                 throw new IllegalStateException(state.name());
         }
-    }
-
-    private void fail(Throwable t) {
-        this.state = State.Faulted;
-        processUnit.onFault(t);
-        this.state = State.Completed;
-        processUnit.onEnd();
+        variableBinder.updateBindings(processInstance);
     }
 
     private void run() {
@@ -101,7 +72,10 @@ public class ProcessUnitInstance implements UnitInstance {
                 processUnit.onSuspend();
             }
         } catch (Throwable t) {
-            fail(t);
+            this.state = State.Faulted;
+            processUnit.onFault(t);
+            this.state = State.Completed;
+            processUnit.onEnd();
         }
     }
 
@@ -152,6 +126,10 @@ public class ProcessUnitInstance implements UnitInstance {
     public Collection<UnitInstance> references() {
         // processes that point at this (currently unsupported)
         return Collections.emptyList();
+    }
+
+    public ProcessInstance getProcessInstance() {
+        return processInstance;
     }
 
     @Override

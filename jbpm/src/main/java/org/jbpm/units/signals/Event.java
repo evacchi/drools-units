@@ -27,6 +27,6 @@ public class Event implements UnitInstance.Signal {
     @Override
     public void exec(UnitInstance unitInstance) {
         ProcessUnitInstance processUnitInstance = (ProcessUnitInstance) unitInstance;
-        processUnitInstance.processInstance.signalEvent(type, payload);
+        processUnitInstance.getProcessInstance().signalEvent(type, payload);
     }
 }
