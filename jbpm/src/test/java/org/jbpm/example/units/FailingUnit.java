@@ -9,7 +9,7 @@ import org.kie.api.UnitInstance;
 import org.kie.api.UnitInstance.State;
 
 public class FailingUnit implements ProcessUnit {
-    
+
     public final List<State> stateSequence = new ArrayList<>();
 
     @Override
@@ -20,11 +20,6 @@ public class FailingUnit implements ProcessUnit {
     @Override
     public void onEnter() {
         log(State.Entering);
-    }
-
-    @Override
-    public void onStart() {
-        log(State.Running);
     }
 
     @Override

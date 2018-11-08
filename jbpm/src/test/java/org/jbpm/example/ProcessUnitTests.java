@@ -33,7 +33,7 @@ public class ProcessUnitTests {
         KieUnitExecutor.create(
                 DynamicUnitSupport.register(
                         ProcessUnitSupport::new)).run(u);
-        assertEquals(asList(Created, Entering, Running, Exiting, Completed),
+        assertEquals(asList(Created, Entering, Exiting, Completed),
                      u.stateSequence);
     }
 
@@ -43,34 +43,7 @@ public class ProcessUnitTests {
         KieUnitExecutor.create(
                 DynamicUnitSupport.register(
                         ProcessUnitSupport::new)).run(u);
-        assertEquals(asList(Created, Entering, Running, Faulted, Completed),
-                     u.stateSequence);
-    }
-
-    @Test
-    public void pausedLifecycleShouldMatch() {
-
-        PausingUnit u = new PausingUnit();
-        KieUnitExecutor executor = KieUnitExecutor.create(
-                DynamicUnitSupport.register(
-                        ProcessUnitSupport::new));
-
-        KieSession session = executor.getSession();
-
-        MyWorkItemHandler handler = new MyWorkItemHandler();
-        WorkItemManager mgr = session.getWorkItemManager();
-        mgr.registerWorkItemHandler("Human Task", handler);
-
-        ProcessUnitInstance instance = (ProcessUnitInstance) executor.run(u);
-        assertEquals(asList(Created, Entering, Suspended),
-                     u.stateSequence);
-
-        u.stateSequence.clear();
-
-        mgr.completeWorkItem(1, null);
-
-        executor.run(instance);
-        assertEquals(asList(ReEntering, Exiting, Completed),
+        assertEquals(asList(Created, Entering, Faulted, Completed),
                      u.stateSequence);
     }
 

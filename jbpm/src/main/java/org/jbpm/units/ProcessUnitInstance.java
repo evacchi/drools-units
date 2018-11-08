@@ -75,10 +75,6 @@ public class ProcessUnitInstance implements UnitInstance {
         switch (state) {
             case Created:
                 run();
-                if (processInstance.getState() == ProcessInstance.STATE_ACTIVE) {
-                    this.state = State.Suspended;
-                    processUnit.onSuspend();
-                }
                 break;
             case Resuming:
                 resume();
@@ -88,16 +84,6 @@ public class ProcessUnitInstance implements UnitInstance {
         }
     }
 
-//    private void run() {
-//        try {
-//            doRun();
-//        } catch (Throwable t) {
-//            fail(t);
-//        } finally {
-//            variableBinder.updateBindings(processInstance);
-//        }
-//    }
-
     private void fail(Throwable t) {
         this.state = State.Faulted;
         processUnit.onFault(t);
@@ -106,11 +92,17 @@ public class ProcessUnitInstance implements UnitInstance {
     }
 
     private void run() {
-        processUnit.onStart();
-        this.state = State.Entering;
-        processUnit.onEnter();
-        this.state = State.Running;
-        session.startProcessInstance(processInstance.getId());
+        try {
+            this.state = State.Entering;
+            processUnit.onEnter();
+            session.startProcessInstance(processInstance.getId());
+            if (processInstance.getState() == ProcessInstance.STATE_ACTIVE) {
+                this.state = State.Suspended;
+                processUnit.onSuspend();
+            }
+        } catch (Throwable t) {
+            fail(t);
+        }
     }
 
     @Override
@@ -146,7 +138,7 @@ public class ProcessUnitInstance implements UnitInstance {
     public void signal(UnitInstance.Signal signal) {
         if (signal instanceof ProcessUnitInstance.Signal) {
         }
-        pendingSignals.add( signal);
+        pendingSignals.add(signal);
         state = State.Resuming;
         // drop anything else
     }
