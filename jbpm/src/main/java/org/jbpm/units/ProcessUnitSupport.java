@@ -1,7 +1,5 @@
 package org.jbpm.units;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -26,6 +24,7 @@ import static org.kie.api.runtime.process.ProcessInstance.STATE_SUSPENDED;
 public class ProcessUnitSupport implements UnitSupport {
 
     private static final Properties props;
+
     static {
         props = new Properties();
         props.put(
@@ -34,69 +33,61 @@ public class ProcessUnitSupport implements UnitSupport {
     }
 
     private final KieSession session;
-    private final Map<Long, ProcessUnitInstance> instances;
+    private final UnitExecutor executor;
     private final WorkItemManager workItemManager;
 
     public ProcessUnitSupport(UnitExecutor executor) {
         this.session = ((LegacySessionWrapper) executor).getSession();
+        this.executor = executor;
         StatefulKnowledgeSessionImpl session =
                 (StatefulKnowledgeSessionImpl) this.session;
         session.getSessionConfiguration().addDefaultProperties(props);
         this.workItemManager = ((WorkItemManager) this.session.getWorkItemManager());
 
         this.session.addEventListener(processEventListener);
-        this.instances = new HashMap<>();
-        workItemManager.setProcessUnitSupport(this);
+        workItemManager.setUnitExecutor(executor);
     }
 
     public Optional<UnitInstance> createInstance(UnitInstance.Proto proto) {
         if (proto.unit() instanceof ProcessUnit) {
             ProcessUnitInstance instance =
                     new ProcessUnitInstance((ProcessUnit) proto.unit(), session);
-            instances.put(instance.id(), instance);
             return Optional.of(instance);
         } else {
             return Optional.empty();
         }
     }
 
+    private final ProcessUnitInstance.Signal TransitionToInternalState = (unitInstance) -> {
+        ProcessUnitInstance instance = (ProcessUnitInstance) unitInstance;
+        UnitInstance.State state = stateOf(instance.getProcessInstance().getState());
+        transitionToState(instance, state);
+    };
+
     private final ProcessEventListener processEventListener = new DefaultProcessEventListener() {
         @Override
         public void beforeProcessCompleted(ProcessCompletedEvent event) {
-            ProcessUnitInstance unitInstance =
-                    instances.get(event.getProcessInstance().getId());
-            transitionToState(unitInstance, UnitInstance.State.Exiting);
+            TransitionToState signal = new TransitionToState(UnitInstance.State.Exiting);
+            executor.active().forEach(instance -> instance.signal(signal));
         }
 
         @Override
         public void afterProcessCompleted(ProcessCompletedEvent event) {
-            ProcessUnitInstance unitInstance =
-                    instances.get(event.getProcessInstance().getId());
-            transitionToState(unitInstance, UnitInstance.State.Completed);
+            TransitionToState signal = new TransitionToState(UnitInstance.State.Completed);
+            executor.active().forEach(instance -> instance.signal(signal));
         }
 
         @Override
         public void afterNodeTriggered(ProcessNodeTriggeredEvent event) {
-            transition(instances.get(event.getProcessInstance().getId()));
+            executor.active().forEach(instance -> instance.signal(TransitionToInternalState));
         }
 
         @Override
         public void afterNodeLeft(ProcessNodeLeftEvent event) {
-            transition(instances.get(event.getProcessInstance().getId()));
+            executor.active().forEach(instance -> instance.signal(TransitionToInternalState));
         }
 
-        private void transition(ProcessUnitInstance unitInstance) {
-            if (unitInstance == null) {
-                return;
-            }
-            UnitInstance.State state = stateOf(unitInstance.getProcessInstance().getState());
-            transitionToState(unitInstance, state);
-        }
     };
-
-    ProcessUnitInstance getProcessUnitInstance(long processInstanceId) {
-        return instances.get(processInstanceId);
-    }
 
     private static void transitionToState(ProcessUnitInstance instance, UnitInstance.State next) {
         if (next == instance.state) {
@@ -151,6 +142,20 @@ public class ProcessUnitSupport implements UnitSupport {
                 return UnitInstance.State.Suspended;
             default:
                 throw new IllegalStateException(String.valueOf(state));
+        }
+    }
+
+    private static class TransitionToState implements ProcessUnitInstance.Signal {
+
+        final UnitInstance.State nextState;
+
+        public TransitionToState(UnitInstance.State nextState) {
+            this.nextState = nextState;
+        }
+
+        @Override
+        public void exec(UnitInstance unitInstance) {
+            transitionToState((ProcessUnitInstance) unitInstance, nextState);
         }
     }
 }

@@ -53,7 +53,7 @@ public class ProcessUnitInstance implements UnitInstance {
             case Created:
                 run();
                 break;
-            case Resuming:
+            case Suspended:
                 resume();
                 break;
             default:
@@ -111,9 +111,12 @@ public class ProcessUnitInstance implements UnitInstance {
     @Override
     public void signal(UnitInstance.Signal signal) {
         if (signal instanceof ProcessUnitInstance.Signal) {
+            if (state == State.Suspended) {
+                pendingSignals.add(signal);
+            } else {
+                signal.exec(this);
+            }
         }
-        pendingSignals.add(signal);
-        state = State.Resuming;
         // drop anything else
     }
 

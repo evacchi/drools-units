@@ -6,41 +6,40 @@ import org.drools.core.common.InternalKnowledgeRuntime;
 import org.drools.core.process.instance.WorkItem;
 import org.drools.core.process.instance.WorkItemManagerFactory;
 import org.drools.core.process.instance.impl.DefaultWorkItemManager;
+import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
 
 public class WorkItemManager extends DefaultWorkItemManager {
 
+    private UnitExecutor executor;
+
     public static class Factory implements WorkItemManagerFactory {
+
         @Override
         public org.drools.core.process.instance.WorkItemManager createWorkItemManager(InternalKnowledgeRuntime internalKnowledgeRuntime) {
             return new WorkItemManager(internalKnowledgeRuntime);
         }
     }
 
-    private ProcessUnitSupport processUnitSupport;
-
     public WorkItemManager(InternalKnowledgeRuntime session) {
         super(session);
     }
 
-    public void setProcessUnitSupport(ProcessUnitSupport processUnitSupport) {
-        this.processUnitSupport = processUnitSupport;
+    public void setUnitExecutor(UnitExecutor executor) {
+        this.executor = executor;
     }
 
     @Override
     public void completeWorkItem(long id, Map<String, Object> results) {
         WorkItem workItem = super.getWorkItem(id);
+        WorkItemCompletedSignal signal = new WorkItemCompletedSignal(workItem, results);
 
-        ProcessUnitInstance pui =
-                processUnitSupport.getProcessUnitInstance(
-                        workItem.getProcessInstanceId());
-        pui.state = UnitInstance.State.Resuming;
-
-        pui.signal(new WorkItemCompletedSignal(workItem, results));
+        executor.active().forEach(
+                pui -> pui.signal(signal));
     }
 }
 
-class WorkItemCompletedSignal implements UnitInstance.Signal {
+class WorkItemCompletedSignal implements ProcessUnitInstance.Signal {
 
     private final WorkItem workItem;
     private final Map<String, Object> results;
@@ -53,6 +52,9 @@ class WorkItemCompletedSignal implements UnitInstance.Signal {
     @Override
     public void exec(UnitInstance unitInstance) {
         ProcessUnitInstance pui = (ProcessUnitInstance) unitInstance;
+        if (pui.id() != workItem.getProcessInstanceId()) {
+            return;
+        }
         workItem.setResults(results);
         workItem.setState(2);
         pui.getProcessInstance().signalEvent("workItemCompleted", workItem);

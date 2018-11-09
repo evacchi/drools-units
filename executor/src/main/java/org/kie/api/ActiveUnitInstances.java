@@ -10,18 +10,25 @@ class ActiveUnitInstances {
     private final UnitSupport sessionFactory;
     private final Set<UnitInstance> activeInstances;
 
-    public ActiveUnitInstances(UnitSupport sessionFactory) {
+    ActiveUnitInstances(UnitSupport sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.activeInstances = new HashSet<>();
     }
 
-    public Optional<UnitInstance> createInstance(UnitInstance.Proto proto) {
+    Optional<UnitInstance> createInstance(UnitInstance.Proto proto) {
         Optional<UnitInstance> optionalInstance = sessionFactory.createInstance(proto);
         optionalInstance.ifPresent(activeInstances::add);
         return optionalInstance;
     }
 
-    public Collection<UnitInstance> get() {
+    Collection<UnitInstance> get() {
         return Collections.unmodifiableCollection(activeInstances);
+    }
+
+    void remove(UnitInstance instance) {
+        if (!activeInstances.remove(instance)) {
+            // log that no instance was removed
+            System.out.println("no instances were removed");
+        }
     }
 }
