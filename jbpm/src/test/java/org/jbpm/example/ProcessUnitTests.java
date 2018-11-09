@@ -7,7 +7,7 @@ import org.jbpm.example.units.HelloUnit;
 import org.jbpm.example.units.HelloVariableUnit;
 import org.jbpm.example.units.PausingUnit;
 import org.jbpm.units.ProcessUnitInstance;
-import org.jbpm.units.ProcessUnitSupport;
+import org.jbpm.units.ProcessUnitSubsystem;
 import org.junit.Test;
 import org.kie.api.DynamicUnitSupport;
 import org.kie.api.KieUnitExecutor;
@@ -33,7 +33,7 @@ public class ProcessUnitTests {
         HelloUnit u = new HelloUnit();
         KieUnitExecutor.create(
                 DynamicUnitSupport.register(
-                        ProcessUnitSupport::new)).run(u);
+                        ProcessUnitSubsystem::new)).run(u);
         assertEquals(asList(Created, Entering, Exiting, Completed),
                      u.stateSequence);
     }
@@ -43,7 +43,7 @@ public class ProcessUnitTests {
         FailingUnit u = new FailingUnit();
         KieUnitExecutor.create(
                 DynamicUnitSupport.register(
-                        ProcessUnitSupport::new)).run(u);
+                        ProcessUnitSubsystem::new)).run(u);
         assertEquals(asList(Created, Entering, Faulted, Completed),
                      u.stateSequence);
     }
@@ -53,7 +53,7 @@ public class ProcessUnitTests {
         HelloVariableUnit u = new HelloVariableUnit(10);
 
         KieUnitExecutor
-                .create(ProcessUnitSupport::new)
+                .create(ProcessUnitSubsystem::new)
                 .run(u);
 
         assertEquals(u.getCount(), 100);
@@ -64,7 +64,7 @@ public class ProcessUnitTests {
         PausingUnit u = new PausingUnit();
         KieUnitExecutor executor = KieUnitExecutor.create(
                 DynamicUnitSupport.register(
-                        ProcessUnitSupport::new));
+                        ProcessUnitSubsystem::new));
 
         KieSession session = executor.getSession();
 

@@ -9,6 +9,13 @@ import org.drools.core.process.instance.impl.DefaultWorkItemManager;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
 
+// for technical reasons, this must be broadcast to all children
+// of the executor, recursively, because we cannot instantiate it
+// from the context of the ProcessUnitSubsystem... but this is
+// an artificial KieConfiguration limitation, which takes a property
+// instead of a lambda/factory instance.
+// todo: consider whether we can avoid this limitation if the above becomes false
+
 public class WorkItemManager extends DefaultWorkItemManager {
 
     private UnitExecutor executor;

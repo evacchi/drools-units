@@ -32,7 +32,7 @@ import org.drools.core.ruleunit.RuleUnitFactory;
 import org.drools.testcoverage.common.model.LongAddress;
 import org.drools.testcoverage.common.model.Person;
 import org.drools.units.RuleUnit;
-import org.drools.units.RuleUnitSupport;
+import org.drools.units.RuleUnitSubsystem;
 import org.drools.units.internal.LegacyRuleUnitExecutor;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,7 +42,6 @@ import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.KieUnitExecutor;
 import org.kie.api.Unit;
-import org.kie.api.UnitExecutor;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.ReleaseId;
@@ -2347,7 +2346,7 @@ public class RuleUnitTest {
 
     static class Stub {
         RuleUnitExecutor bind(KieBase kieBase) {
-            return new LegacyRuleUnitExecutor(KieUnitExecutor.create(kieBase, RuleUnitSupport::new));
+            return new LegacyRuleUnitExecutor(KieUnitExecutor.create(kieBase, RuleUnitSubsystem::new));
         }
     }
 

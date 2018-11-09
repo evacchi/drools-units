@@ -1,6 +1,6 @@
 package org.drools.units.example;
 
-import org.drools.units.RuleUnitSupport;
+import org.drools.units.RuleUnitSubsystem;
 import org.junit.Test;
 import org.kie.api.KieUnitExecutor;
 
@@ -20,7 +20,7 @@ public class RuleUnitTest {
         HelloUnit u = new HelloUnit("Ed");
 
         KieUnitExecutor kieUnitExecutor =
-                KieUnitExecutor.create(RuleUnitSupport::new);
+                KieUnitExecutor.create(RuleUnitSubsystem::new);
 
         kieUnitExecutor.run(u);
 

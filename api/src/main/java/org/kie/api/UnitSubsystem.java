@@ -2,10 +2,11 @@ package org.kie.api;
 
 import java.util.Optional;
 
-public interface UnitSupport {
+public interface UnitSubsystem extends UnitInstanceSignalReceiver {
 
     interface Provider {
-        UnitSupport get(UnitExecutor executor);
+
+        UnitSubsystem get(UnitExecutor executor);
     }
 
     /**
@@ -13,5 +14,5 @@ public interface UnitSupport {
      */
     Optional<UnitInstance> createInstance(UnitInstance.Proto proto);
 
-
+    void signal(UnitInstanceSignal signal);
 }

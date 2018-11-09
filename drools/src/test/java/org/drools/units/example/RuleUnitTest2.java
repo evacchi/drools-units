@@ -3,17 +3,15 @@ package org.drools.units.example;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.units.RuleUnitSupport;
+import org.drools.units.RuleUnitSubsystem;
 import org.drools.units.example.models.BoxOffice;
 import org.drools.units.example.models.BoxOfficeUnit;
 import org.drools.units.example.models.Person;
 import org.drools.units.internal.LegacyRuleUnitExecutor;
 import org.junit.Test;
 import org.kie.api.KieUnitExecutor;
-import org.kie.api.UnitExecutor;
 import org.kie.api.runtime.rule.DataSource;
 import org.kie.api.runtime.rule.FactHandle;
-import org.kie.api.runtime.rule.RuleUnitExecutor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -45,7 +43,7 @@ public class RuleUnitTest2 {
 //        final KieBase kbase = KieBaseUtil.getKieBaseFromKieModuleFromDrl("rule-unit-test", kieBaseTestConfiguration, drl0, drl1, drl2);
         final KieUnitExecutor ex =
 //                RuleUnitExecutor.create().bind(kbase);
-                KieUnitExecutor.create(RuleUnitSupport::new);
+                KieUnitExecutor.create(RuleUnitSubsystem::new);
 
         LegacyRuleUnitExecutor executor = new LegacyRuleUnitExecutor(ex);
         try {

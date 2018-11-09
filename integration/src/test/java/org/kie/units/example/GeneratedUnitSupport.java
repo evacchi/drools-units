@@ -3,22 +3,37 @@ package org.kie.units.example;
 import java.util.Optional;
 
 import org.drools.units.RuleUnit;
-import org.drools.units.RuleUnitSupport;
+import org.drools.units.RuleUnitInstanceSignal;
+import org.drools.units.RuleUnitSubsystem;
 import org.jbpm.units.ProcessUnit;
-import org.jbpm.units.ProcessUnitSupport;
+import org.jbpm.units.ProcessUnitInstanceSignal;
+import org.jbpm.units.ProcessUnitSubsystem;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
-import org.kie.api.UnitSupport;
+import org.kie.api.UnitInstanceSignal;
+import org.kie.api.UnitSubsystem;
 
 // this could be code-gen'd by a processor
-public class GeneratedUnitSupport implements UnitSupport {
+public class GeneratedUnitSupport implements UnitSubsystem {
 
-    private final UnitSupport process;
-    private final UnitSupport rule;
+    private final UnitSubsystem process;
+    private final UnitSubsystem rule;
 
     public GeneratedUnitSupport(UnitExecutor executor) {
-        this.process = new ProcessUnitSupport(executor);
-        this.rule = new RuleUnitSupport(executor);
+        this.process = new ProcessUnitSubsystem(executor);
+        this.rule = new RuleUnitSubsystem(executor);
+    }
+
+    @Override
+    public void signal(UnitInstanceSignal signal) {
+        if (signal instanceof ProcessUnitInstanceSignal) {
+            process.signal(signal);
+        } else if (signal instanceof RuleUnitInstanceSignal) {
+            rule.signal(signal);
+        } else {
+            process.signal(signal);
+            rule.signal(signal);
+        }
     }
 
     @Override

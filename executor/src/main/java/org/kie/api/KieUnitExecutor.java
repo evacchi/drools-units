@@ -9,16 +9,16 @@ public class KieUnitExecutor implements UnitExecutor,
     private KieSession session;
     private final KieBase kieBase;
     private final UnitScheduler scheduler;
-    private final ActiveUnitInstances activeInstances;
+    private final UnitSubsystem instanceFactory;
 
-    public KieUnitExecutor(KieSession session, UnitSupport.Provider supportProvider) {
+    public KieUnitExecutor(KieSession session, UnitSubsystem.Provider supportProvider) {
         this.session = session;
         this.kieBase = session.getKieBase();
         this.scheduler = new UnitScheduler();
-        this.activeInstances = new ActiveUnitInstances(supportProvider.get(this));
+        this.instanceFactory = supportProvider.get(this);
     }
 
-    public static KieUnitExecutor create(UnitSupport.Provider factory) {
+    public static KieUnitExecutor create(UnitSubsystem.Provider factory) {
         KieSession session = KieServices.Factory.get()
                 .getKieClasspathContainer()
                 .getKieBase()
@@ -27,14 +27,14 @@ public class KieUnitExecutor implements UnitExecutor,
         return new KieUnitExecutor(session, factory);
     }
 
-    public static KieUnitExecutor create(KieBase kieBase, UnitSupport.Provider factory) {
+    public static KieUnitExecutor create(KieBase kieBase, UnitSubsystem.Provider factory) {
         KieSession session = kieBase.newKieSession();
         return new KieUnitExecutor(session, factory);
     }
 
     @Override
     public UnitInstance create(UnitInstance.Proto proto) {
-        return activeInstances.createInstance(proto)
+        return instanceFactory.createInstance(proto)
                 .orElseThrow(() -> new UnsupportedOperationException(
                         "Unit type is not supported: " + proto.unit().getClass()));
     }
@@ -66,8 +66,7 @@ public class KieUnitExecutor implements UnitExecutor,
 
     @Override
     public void signal(UnitInstanceSignal signal) {
-        activeInstances.get().forEach(
-                unitInstance -> unitInstance.signal(signal));
+        instanceFactory.signal(signal);
     }
 
     @Override
