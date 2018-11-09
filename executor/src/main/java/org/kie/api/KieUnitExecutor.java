@@ -1,7 +1,5 @@
 package org.kie.api;
 
-import java.util.Collection;
-
 import org.kie.api.internal.LegacySessionWrapper;
 import org.kie.api.runtime.KieSession;
 
@@ -67,13 +65,9 @@ public class KieUnitExecutor implements UnitExecutor,
     }
 
     @Override
-    public Collection<UnitInstance> active() {
-        return activeInstances.get();
-    }
-
-    @Override
-    public void signal(Signal sig) {
-        sig.exec(this);
+    public void signal(UnitInstanceSignal signal) {
+        activeInstances.get().forEach(
+                unitInstance -> unitInstance.signal(signal));
     }
 
     @Override

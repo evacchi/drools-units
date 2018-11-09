@@ -58,7 +58,7 @@ public class ProcessUnitSupport implements UnitSupport {
         }
     }
 
-    private final ProcessUnitInstance.Signal TransitionToInternalState = (unitInstance) -> {
+    private final ProcessUnitInstanceSignal TransitionToInternalState = (unitInstance) -> {
         ProcessUnitInstance instance = (ProcessUnitInstance) unitInstance;
         UnitInstance.State state = stateOf(instance.getProcessInstance().getState());
         transitionToState(instance, state);
@@ -68,23 +68,23 @@ public class ProcessUnitSupport implements UnitSupport {
         @Override
         public void beforeProcessCompleted(ProcessCompletedEvent event) {
             TransitionToState signal = new TransitionToState(UnitInstance.State.Exiting);
-            executor.active().forEach(instance -> instance.signal(signal));
+            executor.signal(signal);
         }
 
         @Override
         public void afterProcessCompleted(ProcessCompletedEvent event) {
             TransitionToState signal = new TransitionToState(UnitInstance.State.Completed);
-            executor.active().forEach(instance -> instance.signal(signal));
+            executor.signal(signal);
         }
 
         @Override
         public void afterNodeTriggered(ProcessNodeTriggeredEvent event) {
-            executor.active().forEach(instance -> instance.signal(TransitionToInternalState));
+            executor.signal(TransitionToInternalState);
         }
 
         @Override
         public void afterNodeLeft(ProcessNodeLeftEvent event) {
-            executor.active().forEach(instance -> instance.signal(TransitionToInternalState));
+            executor.signal(TransitionToInternalState);
         }
 
     };
@@ -145,7 +145,7 @@ public class ProcessUnitSupport implements UnitSupport {
         }
     }
 
-    private static class TransitionToState implements ProcessUnitInstance.Signal {
+    private static class TransitionToState implements ProcessUnitInstanceSignal {
 
         final UnitInstance.State nextState;
 

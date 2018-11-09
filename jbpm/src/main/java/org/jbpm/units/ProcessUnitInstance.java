@@ -8,6 +8,7 @@ import java.util.Deque;
 import org.jbpm.units.internal.VariableBinder;
 import org.jbpm.workflow.instance.WorkflowProcessInstance;
 import org.kie.api.UnitInstance;
+import org.kie.api.UnitInstanceSignal;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
 
@@ -17,11 +18,7 @@ import org.kie.api.runtime.process.ProcessInstance;
  */
 public class ProcessUnitInstance implements UnitInstance {
 
-    public interface Signal extends UnitInstance.Signal {
-
-    }
-
-    private final Deque<UnitInstance.Signal> pendingSignals;
+    private final Deque<UnitInstanceSignal> pendingSignals;
     private final KieSession session;
     private final ProcessUnit processUnit;
     private final VariableBinder variableBinder;
@@ -97,7 +94,7 @@ public class ProcessUnitInstance implements UnitInstance {
         state = State.ReEntering;
         processUnit.onReEnter();
         this.state = State.Running;
-        UnitInstance.Signal sig = pendingSignals.poll();
+        UnitInstanceSignal sig = pendingSignals.poll();
         while (sig != null) {
             sig.exec(this);
             sig = pendingSignals.poll();
@@ -109,8 +106,8 @@ public class ProcessUnitInstance implements UnitInstance {
     }
 
     @Override
-    public void signal(UnitInstance.Signal signal) {
-        if (signal instanceof ProcessUnitInstance.Signal) {
+    public void signal(UnitInstanceSignal signal) {
+        if (signal instanceof ProcessUnitInstanceSignal) {
             if (state == State.Suspended) {
                 pendingSignals.add(signal);
             } else {

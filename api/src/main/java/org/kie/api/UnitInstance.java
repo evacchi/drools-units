@@ -8,7 +8,7 @@ import java.util.Collection;
  * A UnitSession implements all the memory and lifecycle -related concerns
  * of a running Unit instance.
  */
-public interface UnitInstance {
+public interface UnitInstance extends UnitInstanceSignalReceiver {
 
     // start, enter, run, exit, end
     // suspend, resume, re-enter, fault
@@ -37,8 +37,6 @@ public interface UnitInstance {
      */
     Collection<UnitInstance> references();
 
-    void signal(Signal signal);
-
     void yield(UnitInstance next);
 
     void suspend();
@@ -46,10 +44,6 @@ public interface UnitInstance {
     void resume();
 
     State state();
-
-    interface Signal {
-        void exec(UnitInstance unitInstance);
-    }
 
     final class Proto {
 

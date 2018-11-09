@@ -7,6 +7,7 @@ import java.util.Set;
 import org.drools.core.spi.Activation;
 import org.kie.api.Unit;
 import org.kie.api.UnitInstance;
+import org.kie.api.UnitInstanceSignal;
 
 public class GuardedUnitInstance implements UnitInstance {
 
@@ -66,7 +67,7 @@ public class GuardedUnitInstance implements UnitInstance {
     }
 
     @Override
-    public void signal(Signal signal) {
+    public void signal(UnitInstanceSignal signal) {
         unitInstance.signal(signal);
     }
 
@@ -74,5 +75,4 @@ public class GuardedUnitInstance implements UnitInstance {
     public void yield(UnitInstance next) {
         unitInstance.yield(next);
     }
-
 }

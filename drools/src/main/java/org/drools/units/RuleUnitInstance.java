@@ -11,11 +11,10 @@ import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.drools.core.ruleunit.RuleUnitDescription;
 import org.kie.api.Unit;
 import org.kie.api.UnitInstance;
+import org.kie.api.UnitInstanceSignal;
 import org.kie.api.runtime.Globals;
 
 public class RuleUnitInstance implements UnitInstance {
-
-    interface Signal extends UnitInstance.Signal { }
 
     private State state;
     private final StatefulKnowledgeSessionImpl session;
@@ -154,8 +153,8 @@ public class RuleUnitInstance implements UnitInstance {
 //    }
 //
     @Override
-    public void signal(UnitInstance.Signal signal) {
-        if (signal instanceof Signal) {
+    public void signal(UnitInstanceSignal signal) {
+        if (signal instanceof RuleUnitInstanceSignal) {
             signal.exec(this);
         }
     }

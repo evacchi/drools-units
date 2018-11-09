@@ -8,8 +8,7 @@ import org.drools.core.datasources.CursoredDataSource;
 import org.drools.core.datasources.InternalDataSource;
 import org.drools.core.impl.InternalRuleUnitExecutor;
 import org.drools.core.spi.Activation;
-import org.drools.units.signals.RegisterGuard;
-import org.drools.units.signals.UnregisterGuard;
+import org.drools.units.GuardedUnitInstance;
 import org.kie.api.KieBase;
 import org.kie.api.Unit;
 import org.kie.api.UnitBinding;
@@ -144,18 +143,20 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void guardRuleUnit(RuleUnit ruleUnit, Activation activation) {
-        RegisterGuard registerGuardSignal =
-                new RegisterGuard(
-                        new UnitInstance.Proto((Unit) ruleUnit, bindings()),
-                        activation);
-        unitExecutor.signal(registerGuardSignal);
+        UnitInstance instance = unitExecutor.create(new UnitInstance.Proto((Unit) ruleUnit));
+        // fixme we should probably keep track of guard instances (1:1 to ruleUnit)
+        GuardedUnitInstance guarded = new GuardedUnitInstance(instance);
+        // fixme maybe this is a signal:
+        unitExecutor.current().references().add(guarded);
+        guarded.addActivation(activation);
     }
 
     @Override
     public void cancelActivation(Activation activation) {
-        UnregisterGuard signal =
-                new UnregisterGuard(activation);
-        unitExecutor.signal(signal);
+        unitExecutor.current().references()
+                .stream()
+                .filter(u -> u instanceof GuardedUnitInstance)
+                .forEach(u -> ((GuardedUnitInstance) u).removeActivation(activation));
     }
 
     @Override

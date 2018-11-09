@@ -34,12 +34,11 @@ public class WorkItemManager extends DefaultWorkItemManager {
         WorkItem workItem = super.getWorkItem(id);
         WorkItemCompletedSignal signal = new WorkItemCompletedSignal(workItem, results);
 
-        executor.active().forEach(
-                pui -> pui.signal(signal));
+        executor.signal(signal);
     }
 }
 
-class WorkItemCompletedSignal implements ProcessUnitInstance.Signal {
+class WorkItemCompletedSignal implements ProcessUnitInstanceSignal {
 
     private final WorkItem workItem;
     private final Map<String, Object> results;

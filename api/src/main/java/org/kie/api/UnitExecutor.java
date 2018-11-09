@@ -1,8 +1,6 @@
 package org.kie.api;
 
-import java.util.Collection;
-
-public interface UnitExecutor {
+public interface UnitExecutor extends UnitInstanceSignalReceiver {
 
     /**
      * Schedule for execution the given Unit, and keeps running
@@ -15,11 +13,4 @@ public interface UnitExecutor {
 
     UnitInstance current();
 
-    Collection<UnitInstance> active();
-
-    void signal(Signal signal);
-
-    interface Signal {
-        void exec(UnitExecutor executor);
-    }
 }

@@ -1,12 +1,13 @@
 package org.jbpm.units.signals;
 
 import org.jbpm.units.ProcessUnitInstance;
+import org.jbpm.units.ProcessUnitInstanceSignal;
 import org.kie.api.UnitInstance;
 
 /**
  * Represents a process signal event
  */
-public class Event implements UnitInstance.Signal {
+public class Event implements ProcessUnitInstanceSignal {
 
     private final String type;
     private final Object payload;
