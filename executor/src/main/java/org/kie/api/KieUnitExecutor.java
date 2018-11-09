@@ -1,13 +1,6 @@
 package org.kie.api;
 
-import java.util.Map;
-
-import org.drools.core.common.InternalKnowledgeRuntime;
-import org.drools.core.process.instance.WorkItemManager;
-import org.drools.core.process.instance.WorkItemManagerFactory;
-import org.drools.core.process.instance.impl.DefaultWorkItemManager;
 import org.kie.api.internal.LegacySessionWrapper;
-import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
 public class KieUnitExecutor implements UnitExecutor,
@@ -16,13 +9,13 @@ public class KieUnitExecutor implements UnitExecutor,
     private KieSession session;
     private final KieBase kieBase;
     private final UnitScheduler scheduler;
-    private final UnitSupport sessionFactory;
+    private final ActiveUnitInstances activeInstances;
 
     public KieUnitExecutor(KieSession session, UnitSupport.Provider supportProvider) {
         this.session = session;
         this.kieBase = session.getKieBase();
         this.scheduler = new UnitScheduler();
-        this.sessionFactory = supportProvider.get(this);
+        this.activeInstances = new ActiveUnitInstances(supportProvider.get(this));
     }
 
     public static KieUnitExecutor create(UnitSupport.Provider factory) {
@@ -32,6 +25,13 @@ public class KieUnitExecutor implements UnitExecutor,
                 .newKieSession();
 
         return new KieUnitExecutor(session, factory);
+    }
+
+    @Override
+    public UnitInstance create(UnitInstance.Proto proto) {
+        return activeInstances.createInstance(proto)
+                .orElseThrow(() -> new UnsupportedOperationException(
+                        "Unit type is not supported: " + proto.unit().getClass()));
     }
 
     public static KieUnitExecutor create(KieBase kieBase, UnitSupport.Provider factory) {
@@ -45,9 +45,7 @@ public class KieUnitExecutor implements UnitExecutor,
 
     @Override
     public UnitInstance run(UnitInstance.Proto proto) {
-        UnitInstance unitInstance = sessionFactory.createInstance(proto)
-                .orElseThrow(() -> new UnsupportedOperationException(
-                        "Unit type is not supported: " + proto.unit().getClass()));
+        UnitInstance unitInstance = create(proto);
         run(unitInstance);
         return unitInstance;
     }
@@ -70,12 +68,12 @@ public class KieUnitExecutor implements UnitExecutor,
     public void signal(Signal sig) {
         if (sig instanceof Signal.Scoped) {
             Signal.Scoped signal = (Signal.Scoped) sig;
-            UnitInstance instance = sessionFactory.createInstance(signal.proto())
+            UnitInstance instance = activeInstances.createInstance(signal.proto())
                     .orElseThrow(() -> new UnsupportedOperationException(
                             "Unit type is not supported: " + signal.proto().unit().getClass()));
             signal.exec(instance, scheduler);
-        } else if (sig instanceof Signal.Broacast) {
-            Signal.Broacast signal = (Signal.Broacast) sig;
+        } else if (sig instanceof Signal.Broadcast) {
+            Signal.Broadcast signal = (Signal.Broadcast) sig;
             signal.exec(scheduler);
         }
         // else discard

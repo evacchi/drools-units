@@ -7,6 +7,8 @@ public interface UnitExecutor {
      * until the system reaches a stable state
      */
 
+    UnitInstance create(UnitInstance.Proto proto);
+
     UnitInstance run(UnitInstance.Proto proto);
 
     UnitInstance current();
@@ -26,7 +28,7 @@ public interface UnitExecutor {
         /**
          * A signal that may have effect on any element of the scheduler
          */
-        interface Broacast extends Signal {
+        interface Broadcast extends Signal {
             void exec(UnitScheduler scheduler);
         }
     }

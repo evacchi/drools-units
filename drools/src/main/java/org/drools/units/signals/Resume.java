@@ -6,7 +6,7 @@ import org.kie.api.UnitExecutor;
 import org.kie.api.UnitInstance;
 import org.kie.api.UnitScheduler;
 
-public class Resume implements UnitExecutor.Signal.Broacast {
+public class Resume implements UnitExecutor.Signal.Broadcast {
 
     public static final Resume Instance = new Resume();
 

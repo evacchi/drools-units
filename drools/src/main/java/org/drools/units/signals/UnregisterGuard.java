@@ -5,7 +5,7 @@ import org.drools.units.GuardedUnitInstance;
 import org.kie.api.UnitExecutor;
 import org.kie.api.UnitScheduler;
 
-public class UnregisterGuard implements UnitExecutor.Signal.Broacast {
+public class UnregisterGuard implements UnitExecutor.Signal.Broadcast {
 
     private final Activation activation;
 
