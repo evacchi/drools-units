@@ -1,5 +1,7 @@
 package org.kie.api;
 
+import java.util.Collection;
+
 public interface UnitExecutor {
 
     /**
@@ -13,23 +15,11 @@ public interface UnitExecutor {
 
     UnitInstance current();
 
+    Collection<UnitInstance> active();
+
     void signal(Signal signal);
 
     interface Signal {
-
-        /**
-         * A signal that is scoped to an instance of the given Proto
-         */
-        interface Scoped extends Signal {
-            UnitInstance.Proto proto();
-            void exec(UnitInstance instance, UnitScheduler scheduler);
-        }
-
-        /**
-         * A signal that may have effect on any element of the scheduler
-         */
-        interface Broadcast extends Signal {
-            void exec(UnitScheduler scheduler);
-        }
+        void exec(UnitExecutor executor);
     }
 }

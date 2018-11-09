@@ -8,12 +8,8 @@ import org.drools.core.datasources.CursoredDataSource;
 import org.drools.core.datasources.InternalDataSource;
 import org.drools.core.impl.InternalRuleUnitExecutor;
 import org.drools.core.spi.Activation;
-import org.drools.units.GuardedUnitInstance;
 import org.drools.units.signals.RegisterGuard;
-import org.drools.units.signals.Resume;
-import org.drools.units.signals.Suspend;
 import org.drools.units.signals.UnregisterGuard;
-import org.drools.units.signals.Yield;
 import org.kie.api.KieBase;
 import org.kie.api.Unit;
 import org.kie.api.UnitBinding;
@@ -112,12 +108,18 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void onSuspend() {
-        unitExecutor.signal(Suspend.Instance);
+        UnitInstance current = unitExecutor.current();
+        if (current != null) {
+            current.suspend();
+        }
     }
 
     @Override
     public void onResume() {
-        unitExecutor.signal(Resume.Instance);
+        UnitInstance current = unitExecutor.current();
+        if (current != null) {
+            current.resume();
+        }
     }
 
     @Override
@@ -127,10 +129,12 @@ public class LegacyRuleUnitExecutor implements InternalRuleUnitExecutor {
 
     @Override
     public void switchToRuleUnit(RuleUnit ruleUnit, Activation activation) {
-        Yield yieldSignal = new Yield(
-                new UnitInstance.Proto((Unit) ruleUnit, bindings()),
-                activation.getRule().getRuleUnitClassName());
-        unitExecutor.signal(yieldSignal);
+        UnitInstance.Proto proto = new UnitInstance.Proto((Unit) ruleUnit, bindings());
+        UnitInstance current = unitExecutor.current();
+        UnitInstance unitInstance = unitExecutor.create(proto);
+        if (current != null) {
+            current.yield(unitInstance);
+        }
     }
 
     @Override

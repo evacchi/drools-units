@@ -1,5 +1,7 @@
 package org.kie.api;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -19,8 +21,7 @@ class ActiveUnitInstances {
         return optionalInstance;
     }
 
-    public void signal(UnitInstance.Signal signal) {
-        activeInstances.forEach(signal::exec);
+    public Collection<UnitInstance> get() {
+        return Collections.unmodifiableCollection(activeInstances);
     }
-
 }

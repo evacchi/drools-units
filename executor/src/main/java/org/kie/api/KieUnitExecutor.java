@@ -1,5 +1,7 @@
 package org.kie.api;
 
+import java.util.Collection;
+
 import org.kie.api.internal.LegacySessionWrapper;
 import org.kie.api.runtime.KieSession;
 
@@ -27,16 +29,16 @@ public class KieUnitExecutor implements UnitExecutor,
         return new KieUnitExecutor(session, factory);
     }
 
+    public static KieUnitExecutor create(KieBase kieBase, UnitSupport.Provider factory) {
+        KieSession session = kieBase.newKieSession();
+        return new KieUnitExecutor(session, factory);
+    }
+
     @Override
     public UnitInstance create(UnitInstance.Proto proto) {
         return activeInstances.createInstance(proto)
                 .orElseThrow(() -> new UnsupportedOperationException(
                         "Unit type is not supported: " + proto.unit().getClass()));
-    }
-
-    public static KieUnitExecutor create(KieBase kieBase, UnitSupport.Provider factory) {
-        KieSession session = kieBase.newKieSession();
-        return new KieUnitExecutor(session, factory);
     }
 
     public UnitInstance run(Unit u) {
@@ -65,18 +67,13 @@ public class KieUnitExecutor implements UnitExecutor,
     }
 
     @Override
+    public Collection<UnitInstance> active() {
+        return activeInstances.get();
+    }
+
+    @Override
     public void signal(Signal sig) {
-        if (sig instanceof Signal.Scoped) {
-            Signal.Scoped signal = (Signal.Scoped) sig;
-            UnitInstance instance = activeInstances.createInstance(signal.proto())
-                    .orElseThrow(() -> new UnsupportedOperationException(
-                            "Unit type is not supported: " + signal.proto().unit().getClass()));
-            signal.exec(instance, scheduler);
-        } else if (sig instanceof Signal.Broadcast) {
-            Signal.Broadcast signal = (Signal.Broadcast) sig;
-            signal.exec(scheduler);
-        }
-        // else discard
+        sig.exec(this);
     }
 
     @Override
