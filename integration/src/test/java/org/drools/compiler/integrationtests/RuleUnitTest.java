@@ -35,6 +35,7 @@ import org.drools.units.RuleUnit;
 import org.drools.units.RuleUnitSubsystem;
 import org.drools.units.internal.LegacyRuleUnitExecutor;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -63,6 +64,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+@Ignore
 @RunWith(Parameterized.class)
 public class RuleUnitTest {
 
