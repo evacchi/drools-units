@@ -9,12 +9,18 @@ import org.kie.api.UnitInstance;
  */
 public class Event implements ProcessUnitInstanceSignal {
 
+    private final long id;
     private final String type;
     private final Object payload;
 
-    public Event(String type, Object payload) {
+    public Event(long id, String type, Object payload) {
+        this.id = id;
         this.type = type;
         this.payload = payload;
+    }
+
+    public long id() {
+        return id;
     }
 
     public String type() {
@@ -28,6 +34,10 @@ public class Event implements ProcessUnitInstanceSignal {
     @Override
     public void exec(UnitInstance unitInstance) {
         ProcessUnitInstance processUnitInstance = (ProcessUnitInstance) unitInstance;
-        processUnitInstance.getProcessInstance().signalEvent(type, payload);
+        if (processUnitInstance.id() == id()) {
+            processUnitInstance
+                    .getProcessInstance()
+                    .signalEvent(type(), payload());
+        }
     }
 }

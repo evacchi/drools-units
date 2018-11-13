@@ -44,7 +44,7 @@ public class ProcessUnitSubsystem implements UnitSubsystem {
         this.workItemManager = ((WorkItemManager) this.session.getWorkItemManager());
 
         this.session.addEventListener(processEventListener);
-        this.workItemManager.setUnitExecutor(executor);
+        this.workItemManager.setProcessUnitSubsystem(this);
     }
 
     public Optional<UnitInstance> createInstance(UnitInstance.Proto proto) {
