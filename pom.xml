@@ -19,6 +19,7 @@
     <module>executor</module>
     <module>jbpm</module>
     <module>drools</module>
+    <module>bayes</module>
     <module>integration</module>
   </modules>
 
